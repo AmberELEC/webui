@@ -22,7 +22,7 @@ def index():
             'roms': len(list_files(system_folder_path))
         })
 
-    systems_sorted = sorted(systems, key=lambda d: (-d['roms'], d['fullname']))
+    systems_sorted = sorted(systems, key=lambda k: (-k['roms'], k['fullname']))
 
     return dict(systems=json.dumps(systems_sorted))
 
@@ -31,13 +31,13 @@ def index():
 @view('system')
 def view_system(system):
     root = ElementTree.parse(os.path.join(roms_folder, system, 'gamelist.xml')).getroot()
-    games = { }
+    games = []
 
     for game in root.iter('game'):
         id = game.attrib.get('id')
         rom_filename = normalize_path(find_normalized(game, 'path'))
-        games[id] = {
-            'id': id,
+        games.append({
+            'id': id or False,
             'name': find_normalized(game, 'name'),
             'desc': find_normalized(game, 'desc'),
             'image': find_image_path(game, 'image'),
@@ -46,23 +46,27 @@ def view_system(system):
             'publisher': find_normalized(game, 'publisher'),
             'genre': find_normalized(game, 'genre'),
             'path': rom_filename,
-        }
+        })
 
     system_name = system
     if system in system_map:
         system_name = system_map[system]
 
-    sorted_games = sorted(games, key = lambda k: (games[k]['name']))
-    sorted_dict = { k: games[k] for k in sorted_games }
+    sorted_games = sorted(games, key=lambda k: (k['name']))
 
-    return dict(system=system, system_name=system_name, games=json.dumps(sorted_dict))
+    return dict(system=system, system_name=system_name, games=json.dumps(sorted_games))
 
 
-@route('/system/<system>/<game_id>')
+@route('/system/<system>/<game_ref:int>')
+@route('/system/<system>/<game_ref:path>')
 @view('game')
-def view_game(system, game_id):
+def view_game(system, game_ref):
     root = ElementTree.parse(os.path.join(roms_folder, system, 'gamelist.xml')).getroot()
-    ele = root.find(".//game[@id='%s']" % game_id)
+
+    if game_ref.isdigit():
+        ele = root.find(".//game[@id='%s']" % game_ref)
+    else:
+        ele = root.findall(".//game/[path=\"./%s\"]" % unescape(game_ref))[0]
 
     rom_filename = remove_prefix(find_normalized(ele, 'path'), './')
     rom_path = os.path.join(roms_folder, system, rom_filename)
@@ -95,7 +99,7 @@ def view_game(system, game_id):
     if system in system_map:
         system_name = system_map[system]
 
-    return dict(system=system, system_name=system_name, game=game, game_id=game_id, running=emu_running())
+    return dict(system=system, system_name=system_name, game=game, game_id=game_ref, running=emu_running())
 
 
 @route('/svg/<system>')
