@@ -1,6 +1,8 @@
 host = "0.0.0.0"
 port = 8080
 
-roms_folder = "/roms/"
 debug = False
 reloader = False
+
+roms_folder = "/roms/"
+es_systems = "/usr/config/emulationstation/es_systems.cfg"
