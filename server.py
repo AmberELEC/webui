@@ -95,7 +95,7 @@ def view_game(system, game_id):
     if system in system_map:
         system_name = system_map[system]
 
-    return dict(system=system, system_name=system_name, game=game, game_id=game_id)
+    return dict(system=system, system_name=system_name, game=game, game_id=game_id, running=emu_running())
 
 
 @route('/svg/<system>')
@@ -160,6 +160,17 @@ def view_screenshot(screenshot):
 def assets(path):
     root = os.path.join(os.getcwd(), 'assets')
     return static_file(path, root=root)
+
+
+@route('/launch/<system>/<rom>')
+def assets(system, rom):
+    path = os.path.join(roms_folder, system, rom)
+    start_game(path)
+
+
+@route('/exitemu')
+def assets():
+    close_game()
 
 
 run(host=host, port=port, reloader=reloader, debug=debug)

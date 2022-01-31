@@ -45,6 +45,10 @@
         });
     </script>
     <style>
+        body {
+            overflow-x: hidden;
+        }
+
         @font-face {
             font-family: 'DREAMS';
             src: url('/assets/fonts/DREAMS.woff2') format('woff2'),

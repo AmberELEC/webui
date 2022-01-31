@@ -1,5 +1,8 @@
 import os
 import datetime
+import http.client
+import subprocess
+import platform
 
 from html import unescape
 from config import *
@@ -123,3 +126,39 @@ def map_system_folder(system):
 
 def normalize_path(path):
     return remove_prefix(path, "./")
+
+def http_post(path, body=""):
+    headers = { 'Content-type': 'text/plain', 'Accept': 'text/plain' }
+    conn = http.client.HTTPConnection('127.0.0.1', 1234)
+    conn.request('POST', path, body, headers)
+    response = conn.getresponse()
+    data = response.read()
+    conn.close()
+    return data
+
+def http_get(path, body=""):
+    headers = { 'Content-type': 'text/plain', 'Accept': 'text/plain' }
+    conn = http.client.HTTPConnection('127.0.0.1', 1234)
+    conn.request('GET', path, body, headers)
+    response = conn.getresponse()
+    data = response.read()
+    conn.close()
+    return data
+
+def start_game(rom_path):
+    http_post('/launch', rom_path)
+
+def close_game():
+    emu_kill()
+
+def emu_kill():
+    if platform.system() == 'Darwin':
+        return True
+    path = os.path.join(os.getcwd(), 'helpers.sh')
+    return subprocess.call(["/bin/bash", path, "--emukill"]) == 0
+
+def emu_running():
+    if platform.system() == 'Darwin':
+        return False
+    path = os.path.join(os.getcwd(), 'helpers.sh')
+    return subprocess.call(["/bin/bash", path, "--emupid"]) == 0

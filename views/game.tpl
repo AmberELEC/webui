@@ -28,12 +28,31 @@
 
         <div class="bg-white dark:bg-slate-700 shadow dark:shadow-none overflow-hidden sm:rounded-lg">
             <div class="px-3 py-3 sm:px-3 bg-slate-700 dark:bg-slate-800 text-white">
-                <h3 class="text-lg leading-6 font-medium">
-                    {{ game["name"] }}
-                </h3>
-                <p class="mt-1 max-w-2xl text-sm opacity-40">
-                    {{ game["path"] }}
-                </p>
+                <div class="grid grid-cols-2">
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium">
+                            {{ game["name"] }}
+                        </h3>
+                        <p class="mt-1 max-w-2xl text-sm opacity-40">
+                            {{ game["path"] }}
+                        </p>
+                    </div>
+                    <div x-data="gameLauncher()" class="justify-self-end">
+                        <div
+                            x-show="toastOpen"
+                            class="w-96 p-4 rounded fixed top-4 right-4 transform-gpu transition-transform duration-400 ease bg-slate-600 text-slate-200"
+                            x-transition:enter-start="translate-x-full"
+                            x-transition:enter-end="translate-x-0"
+                            x-transition:leave-start="translate-x-0"
+                            x-transition:leave-end="translate-x-full"
+                        >
+                            <p class="text-white"><strong x-text="title"></strong></p>
+                            <p class="mt-2 text-sm text-white" x-text="message"></p>
+                        </div>
+                        <span x-show="!open" class="text-xs text-bold text-green-100 bg-green-600 p-1 px-2 rounded cursor-pointer" x-on:click="openGame();"><i class="fas fa-play pr-1"></i> Play</span>
+                        <span x-show="open" class="text-xs text-bold text-red-100 bg-red-600 p-1 px-2 rounded cursor-pointer" x-on:click="closeGame();"><i class="fas fa-stop pr-1"></i> Close</span>
+                    </div>
+                </div>
             </div>
             <div class="border-t border-slate-200 dark:border-slate-800 px-3 py-3 sm:p-0 dark:text-white">
                 <dl class="sm:divide-y sm:divide-slate-200 sm:dark:divide-slate-800">
@@ -149,6 +168,7 @@
                                             </span>
                                         </div>
                                         <div class="ml-4 flex-shrink-0">
+                                            <a x-on:click="if (!confirm('Are you sure you want to delete this file?')) $event.preventDefault()" href="/screenshots/{{ screenshot }}/delete"><i class="text-red-600 dark:text-red-300  fas fa-trash pr-1"></i></a>
                                             <a @click="show_modal = true; modal_src = '/screenshots/{{ screenshot }}';" class="font-medium underline text-slate-600 hover:text-slate-500 dark:text-slate-200 dark:hover:text-slate-300 cursor-pointer"><i class="fas fa-eye"></i></a>
                                         </div>
                                     </li>
@@ -203,6 +223,36 @@
     </div>
 
     <script>
+        function gameLauncher() {
+            return {
+                open: {{ 'true' if running else 'false' }},
+                toastOpen: false,
+                title: "",
+                message: "",
+                success: false,
+                openGame() {
+                    this.title = "Launching Game";
+                    this.message = "{{ game["name"] }} is launching now. Have fun!";
+                    this.open = true;
+                    this.toastOpen = true;
+                    fetch("/launch/{{ system }}/{{ game["path"] }}");
+                    setTimeout(() => {
+                        this.toastOpen = false;
+                    }, 5000);
+                },
+                closeGame() {
+                    this.title = "Closing Game";
+                    this.message = "The running game is now being closed.";
+                    this.open = false;
+                    this.toastOpen = true;
+                    fetch("/exitemu");
+                    setTimeout(() => {
+                        this.toastOpen = false;
+                    }, 5000);
+                }
+            }
+        }
+
         function htmlDecode(input) {
             var doc = new DOMParser().parseFromString(input, "text/html");
             return doc.documentElement.textContent;
