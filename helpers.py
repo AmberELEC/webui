@@ -21,16 +21,17 @@ def list_folders(path):
 
 def list_files(path):
     files = []
-    for entry in os.scandir(path):
-        if not entry.name.startswith('.') and entry.is_file():
-            files.append(entry.name)
+    if folder_exists(path):
+        for entry in os.scandir(path):
+            if not entry.name.startswith('.') and entry.is_file():
+                files.append(entry.name)
     return files
 
 def file_exists(path, file):
     return os.path.isfile(os.path.join(path, file))
 
-def folder_exists(path, file):
-    return os.path.isfile(os.path.join(path, file))
+def folder_exists(path):
+    return os.path.isdir(path)
 
 def remove_prefix(text, prefix):
     if text.startswith(prefix):
