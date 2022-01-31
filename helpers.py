@@ -1,7 +1,13 @@
 import os
 import datetime
 from html import unescape
-from ftfy import fix_text
+
+try:
+    from ftfy import fix_text
+except ModuleNotFoundError:
+    def fix_text(text):
+        return text
+
 from data import *
 
 def list_folders(path):
