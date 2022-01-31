@@ -1,8 +1,11 @@
 # 351ELEC WebUI
 A web UI for managing your 351ELEC device ROMs.
 
+# Requirements
+Python 3 or Python 2.7 are required. If the `ftfy` package is installed, it will be used to fix broken text encodings.
+
 # License
-The core project is licensed under GPLv3, `ftfy` and `wcwidth` packaged projects have appropriate licenses attached.
+The core project is licensed under GPLv3.
 
 All system logos are copyright to their respective owners.
 
