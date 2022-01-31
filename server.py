@@ -11,23 +11,20 @@ from config import *
 @route('/')
 @view('index')
 def index():
-    systems = { }
-    system_folders = list_folders(roms_folder)
+    systems = []
 
-    for system_folder in system_folders:
-        if not system_folder.lower() in ignored_systems:
-            system_folder_path = os.path.join(roms_folder, system_folder)
-            systems[system_folder] = {
-                'name': map_system_folder(system_folder),
-                'folder': system_folder,
-                'path': system_folder_path,
-                'roms': len(list_files(system_folder_path))
-            }
+    for system in es_systems.iter('system'):
+        system_folder_path = find_normalized(system, 'path')
+        systems.append({
+            'fullname': find_normalized(system, 'fullname'),
+            'name': find_normalized(system, 'name'),
+            'path': find_normalized(system, 'path'),
+            'roms': len(list_files(system_folder_path))
+        })
 
-    systems_sorted = sorted(systems, key = lambda k: (-systems[k]['roms'], systems[k]['name']))
-    sorted_dict = { k: systems[k] for k in systems_sorted }
+    systems_sorted = sorted(systems, key=lambda d: (-d['roms'], d['fullname']))
 
-    return dict(systems=json.dumps(sorted_dict))
+    return dict(systems=json.dumps(systems_sorted))
 
 
 @route('/system/<system>')

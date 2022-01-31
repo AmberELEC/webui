@@ -1,3 +1,10 @@
+import os
+import xml.etree.ElementTree as ElementTree
+
+from config import *
+
+es_systems = ElementTree.parse(es_systems_path).getroot()
+
 ignored_systems = [
     "bios",
     "screenshots",
