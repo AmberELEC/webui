@@ -198,7 +198,7 @@
                         % end
                     </div>
                     <p class="mt-2 block text-sm font-medium text-slate-900 dark:text-slate-300 truncate pointer-events-none">Marquee</p>
-                    <p class="block text-xs font-medium text-slate-500 dark:text-slate-500 pointer-events-none truncate">{{ game["marquee"] }}</p>
+                    <p class="block text-xs font-medium text-slate-500 dark:text-slate-500 pointer-events-none truncate">{{ game["marquee"] or "Not Found" }}</p>
                 </li>
 
 
@@ -211,7 +211,7 @@
                         % end
                     </div>
                     <p class="mt-2 block text-sm font-medium text-slate-900 dark:text-slate-300 truncate pointer-events-none">Image</p>
-                    <p class="block text-xs font-medium text-slate-500 dark:text-slate-500 pointer-events-none truncate">{{ game["image"] }}</p>
+                    <p class="block text-xs font-medium text-slate-500 dark:text-slate-500 pointer-events-none truncate">{{ game["image"] or "Not Found" }}</p>
                 </li>
 
 
@@ -224,7 +224,7 @@
                         % end
                     </div>
                     <p class="mt-2 block text-sm font-medium text-slate-900 dark:text-slate-300 truncate pointer-events-none">Thumbnail</p>
-                    <p class="block text-xs font-medium text-slate-500 dark:text-slate-500 pointer-events-none truncate">{{ game["thumbnail"] }}</p>
+                    <p class="block text-xs font-medium text-slate-500 dark:text-slate-500 pointer-events-none truncate">{{ game["thumbnail"] or "Not Found" }}</p>
                 </li>
 
                 <li class="relative pr-3 pb-3 flex flex-col">
@@ -238,7 +238,7 @@
                         % end
                     </div>
                     <p class="mt-2 block text-sm font-medium text-slate-900 dark:text-slate-300 truncate pointer-events-none">Video</p>
-                    <p class="block text-xs font-medium text-slate-500 dark:text-slate-500 pointer-events-none truncate">{{ game["video"] }}</p>
+                    <p class="block text-xs font-medium text-slate-500 dark:text-slate-500 pointer-events-none truncate">{{ game["video"] or "Not Found" }}</p>
                 </li>
         </ul>
     </div>

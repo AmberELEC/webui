@@ -17,6 +17,7 @@
                     <div class="flex items-center justify-center w-100 h-20 bg-slate-700 dark:bg-slate-800 text-white text-sm font-medium rounded-t-md">
                         <img x-show="item.marquee" loading="lazy" :src="`/image/{{ system }}/${item.marquee}`" class="w-1/2 max-h-20 p-2" :alt="item.name">
                         <img x-show="!item.marquee && item.image" loading="lazy" :src="`/image/{{ system }}/${item.image}`" class="w-1/2 max-h-20 p-2" :alt="item.name">
+                        <img x-show="!item.marquee && !item.image" loading="lazy" src="/svg/{{ system }}" class="w-1/2 max-h-20 p-2" :alt="item.name">
                     </div>
                     <div class="flex items-center justify-between border-t border-r border-b border-slate-200 dark:border-slate-900 bg-white dark:bg-slate-700 rounded-b-md truncate">
                         <div class="flex-1 px-4 py-2 text-sm truncate">

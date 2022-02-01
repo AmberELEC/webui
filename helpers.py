@@ -28,6 +28,14 @@ def list_files(path):
                 files.append(entry.name)
     return files
 
+def list_files_with_extensions(path, extensions):
+    files = []
+    if folder_exists(path):
+        for entry in os.scandir(path):
+            if not entry.name.startswith('.') and entry.is_file() and os.path.splitext(entry)[1] in extensions:
+                files.append(entry.name)
+    return files
+
 def file_exists(path, file):
     return os.path.isfile(os.path.join(path, file))
 
@@ -168,3 +176,135 @@ def emu_running():
         return False
     path = os.path.join(os.getcwd(), 'helpers.sh')
     return subprocess.call(["/bin/bash", path, "--emupid"]) == 0
+
+
+def get_system_info(system):
+    return {
+        'name': find_normalized(system, 'name'),
+        'fullname': find_normalized(system, 'fullname'),
+        'manufacturer': find_image_path(system, 'manufacturer'),
+        'release': find_image_path(system, 'release'),
+        'hardware': find_normalized(system, 'hardware'),
+        'path': find_normalized(system, 'path'),
+        'extension': find_normalized(system, 'extension')
+    }
+
+def get_game_info(system, game_ref):
+    gamelist = os.path.join(roms_folder, system, 'gamelist.xml')
+
+    if os.path.isfile(gamelist):
+        root = ElementTree.parse(gamelist).getroot()
+
+        if game_ref.isdigit():
+            ele = root.find(".//game[@id='%s']" % game_ref)
+        else:
+            ele = root.find(".//game/[path=\"./%s\"]" % unescape(game_ref))
+
+        if ele != None:
+
+            rom_filename = remove_prefix(find_normalized(ele, 'path'), './')
+            rom_path = os.path.join(roms_folder, system, rom_filename)
+
+            game = {
+                'name': find_normalized(ele, 'name'),
+                'desc': find_normalized(ele, 'desc'),
+                'developer': find_normalized(ele, 'developer'),
+                'publisher': find_normalized(ele, 'publisher'),
+                'genre': find_normalized(ele, 'genre'),
+                'players': find_normalized(ele, 'players'),
+                'region': find_normalized(ele, 'region'),
+                'lang': find_normalized(ele, 'lang'),
+                'image': find_image_path(ele, 'image'),
+                'thumbnail': find_image_path(ele, 'thumbnail'),
+                'marquee': find_image_path(ele, 'marquee'),
+                'video': find_video_path(ele, 'video'),
+                'rating': find_float(ele, 'rating'),
+                'path': find_normalized_path(ele, 'path'),
+                'releasedate': find_date(ele, 'releasedate'),
+                'lastplayed': find_date(ele, 'lastplayed'),
+                'playcount': find_int(ele, 'playcount'),
+                'gametime': find_int(ele, 'gametime'),
+                'size': getsize_fmt(rom_path),
+                'have_rom': os.path.isfile(rom_path),
+                'saves': find_saves(system, rom_filename),
+                'screenshots': find_screenshots(rom_filename)
+            }
+
+            return game
+
+    rom_path = os.path.join(roms_folder, system, unescape(game_ref))
+    if os.path.isfile(rom_path):
+        game = {
+            'name': game_ref,
+            'desc': False,
+            'developer': False,
+            'publisher': False,
+            'genre': False,
+            'players': False,
+            'region': False,
+            'lang': False,
+            'image': False,
+            'thumbnail': False,
+            'marquee': False,
+            'video': False,
+            'rating': False,
+            'path': os.path.basename(rom_path),
+            'releasedate': False,
+            'lastplayed': False,
+            'playcount': False,
+            'gametime': False,
+            'size': getsize_fmt(rom_path),
+            'have_rom': True,
+            'saves': find_saves(system, rom_path),
+            'screenshots': find_screenshots(rom_path),
+        }
+
+        return game
+    else:
+        return False
+
+def list_roms(system_ele):
+    system = find_normalized_system_path(system_ele, 'path')
+    gamelist = os.path.join(roms_folder, system, 'gamelist.xml')
+
+    roms = []
+    known_roms = []
+
+    if os.path.isfile(gamelist):
+        root = ElementTree.parse(gamelist).getroot()
+        for game in root.iter('game'):
+            id = game.attrib.get('id')
+            rom_filename = normalize_path(find_normalized(game, 'path'))
+            known_roms.append(rom_filename)
+            roms.append({
+                'id': id or False,
+                'name': find_normalized(game, 'name'),
+                'desc': find_normalized(game, 'desc'),
+                'image': find_image_path(game, 'image'),
+                'marquee': find_image_path(game, 'marquee'),
+                'developer': find_normalized(game, 'developer'),
+                'publisher': find_normalized(game, 'publisher'),
+                'genre': find_normalized(game, 'genre'),
+                'path': rom_filename,
+            })
+
+    rom_files = list_files(os.path.join(roms_folder, system))
+    extensions = system_ele.find("extension").text.split(" ")
+
+    for file in rom_files:
+        filename, extension = os.path.splitext(file)
+        if extension in extensions and file not in known_roms:
+            known_roms.append(file)
+            roms.append({
+                'id': False,
+                'name': filename,
+                'desc': False,
+                'image': False,
+                'marquee': False,
+                'developer': False,
+                'publisher': False,
+                'genre': False,
+                'path': file,
+            })
+
+    return roms
