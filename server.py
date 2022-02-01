@@ -1,17 +1,16 @@
 import os
-import xml.etree.ElementTree as ElementTree
 import json
 
 from urllib.parse import unquote
-from bottle import route, run, template, view, static_file, response
+from bottle import route, run, template, view, static_file, response, request
 from helpers import *
-from data import *
 from config import *
 
 @route('/')
 @view('index')
 def index():
     systems = []
+    es_systems = ElementTree.parse(es_systems_path).getroot()
 
     for system in es_systems.iter('system'):
         system_folder_path = find_normalized(system, 'path')
@@ -30,8 +29,23 @@ def index():
 @route('/system/<system>')
 @view('system')
 def view_system(system):
+    es_systems = ElementTree.parse(es_systems_path).getroot()
     root = ElementTree.parse(os.path.join(roms_folder, system, 'gamelist.xml')).getroot()
     games = []
+    system_info = { }
+
+    system_ele = es_systems.findall(".//system/[name=\"%s\"]" % system)[0]
+
+    if system_ele:
+        system_info = {
+            'name': find_normalized(system_ele, 'name'),
+            'fullname': find_normalized(system_ele, 'fullname'),
+            'manufacturer': find_image_path(system_ele, 'manufacturer'),
+            'release': find_image_path(system_ele, 'release'),
+            'hardware': find_normalized(system_ele, 'hardware'),
+            'path': find_normalized(system_ele, 'path'),
+            'extension': find_normalized(system_ele, 'extension')
+        }
 
     for game in root.iter('game'):
         id = game.attrib.get('id')
@@ -48,13 +62,11 @@ def view_system(system):
             'path': rom_filename,
         })
 
-    system_name = system
-    if system in system_map:
-        system_name = system_map[system]
+    system_name = map_system_folder(system)
 
     sorted_games = sorted(games, key=lambda k: (k['name']))
 
-    return dict(system=system, system_name=system_name, games=json.dumps(sorted_games))
+    return dict(system=system, system_name=system_name, games=json.dumps(sorted_games), system_info=system_info)
 
 
 @route('/system/<system>/<game_ref:int>')
@@ -96,9 +108,7 @@ def view_game(system, game_ref):
         'screenshots': find_screenshots(rom_filename)
     }
 
-    system_name = system
-    if system in system_map:
-        system_name = system_map[system]
+    system_name = map_system_folder(system)
 
     return dict(system=system, system_name=system_name, game=game, game_id=game_ref, running=emu_running())
 

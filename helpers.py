@@ -1,8 +1,8 @@
 import os
 import datetime
-import http.client
 import subprocess
 import platform
+import xml.etree.ElementTree as ElementTree
 
 from html import unescape
 from config import *
@@ -123,8 +123,10 @@ def getsize_fmt(path):
         return "0b"
 
 def map_system_folder(system):
-    if system in system_map:
-        return system_map[system]
+    es_systems = ElementTree.parse(es_systems_path).getroot()
+    system_ele = es_systems.findall(".//system/[name=\"%s\"]" % system)[0]
+    if system_ele:
+        return system_ele.find("fullname").text
     return system
 
 def normalize_path(path):
