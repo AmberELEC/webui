@@ -129,9 +129,16 @@
                                     </span>
                                 </div>
                                 <div class="ml-4 flex-shrink-0">
-                                    <a href="/rom/{{ system }}/{{ game["path"] }}" class="font-medium underline text-slate-600 hover:text-slate-500 dark:text-slate-200 dark:hover:text-slate-300">
-                                        <i class="far fa-download"></i>
-                                    </a>
+                                    % if game["have_rom"]:
+                                        <a href="/rom/{{ system }}/{{ game["path"] }}" class="font-medium underline text-slate-600 hover:text-slate-500 dark:text-slate-200 dark:hover:text-slate-300">
+                                            <i class="far fa-download"></i>
+                                        </a>
+                                    % else:
+                                        <span class="font-medium text-slate-600 dark:text-slate-200">
+                                            Missing ROM
+                                        </span>
+                                    % end
+
                                 </div>
                             </li>
                         </ul>
@@ -181,44 +188,58 @@
         </div>
 
         <ul role="list" class="grid grid-cols-1 md:grid-cols-2 gap-0 mx-auto">
-            % if game["marquee"]:
+
                 <li class="relative pr-3 pb-3 flex flex-col">
                     <div class="flex checkers grow group block w-full aspect-w-10 aspect-h-7 rounded-lg bg-slate-100 overflow-hidden cursor-pointer">
+                        % if game["marquee"]:
                         <img @click="show_modal = true; modal_src = $event.target.src;" src="/image/{{ system }}/{{ game["marquee"] }}" alt="marquee" class="self-center w-full p-3">
+                        % else:
+                        <img src="/svg/image-not-found" class="self-center w-full p-3" alt="None">
+                        % end
                     </div>
                     <p class="mt-2 block text-sm font-medium text-slate-900 dark:text-slate-300 truncate pointer-events-none">Marquee</p>
                     <p class="block text-xs font-medium text-slate-500 dark:text-slate-500 pointer-events-none truncate">{{ game["marquee"] }}</p>
                 </li>
-            % end
-            % if game["image"]:
+
+
                 <li class="relative pr-3 pb-3 flex flex-col">
                     <div class="flex checkers grow group block w-full aspect-w-10 aspect-h-7 rounded-lg bg-slate-100 overflow-hidden cursor-pointer">
+                        % if game["image"]:
                         <img @click="show_modal = true; modal_src = $event.target.src;" src="/image/{{ system }}/{{ game["image"] }}" alt="image" class="self-center w-full">
+                        % else:
+                        <img src="/svg/image-not-found" class="self-center w-full p-3" alt="None">
+                        % end
                     </div>
                     <p class="mt-2 block text-sm font-medium text-slate-900 dark:text-slate-300 truncate pointer-events-none">Image</p>
                     <p class="block text-xs font-medium text-slate-500 dark:text-slate-500 pointer-events-none truncate">{{ game["image"] }}</p>
                 </li>
-            % end
-            % if game["thumbnail"]:
+
+
                 <li class="relative pr-3 pb-3 flex flex-col">
                     <div class="flex checkers grow group block w-full aspect-w-10 aspect-h-7 rounded-lg bg-slate-100 overflow-hidden cursor-pointer">
+                        % if game["thumbnail"]:
                         <img @click="show_modal = true; modal_src = $event.target.src;" src="/image/{{ system }}/{{ game["thumbnail"] }}" alt="thumbnail" class="self-center w-full">
+                        % else:
+                        <img src="/svg/image-not-found" class="self-center w-full p-3" alt="None">
+                        % end
                     </div>
                     <p class="mt-2 block text-sm font-medium text-slate-900 dark:text-slate-300 truncate pointer-events-none">Thumbnail</p>
                     <p class="block text-xs font-medium text-slate-500 dark:text-slate-500 pointer-events-none truncate">{{ game["thumbnail"] }}</p>
                 </li>
-            % end
-            % if game["video"]:
+
                 <li class="relative pr-3 pb-3 flex flex-col">
                     <div class="flex checkers grow group block w-full aspect-w-10 aspect-h-7 rounded-lg bg-slate-100 overflow-hidden">
+                        % if game["video"]:
                         <video width="100%" class="self-center w-full" loop autoplay muted>
                             <source src="/video/{{ system }}/{{ game["video"] }}" type="video/mp4">
                         </video>
+                        % else:
+                        <img src="/svg/image-not-found" class="self-center w-full p-3" alt="None">
+                        % end
                     </div>
                     <p class="mt-2 block text-sm font-medium text-slate-900 dark:text-slate-300 truncate pointer-events-none">Video</p>
                     <p class="block text-xs font-medium text-slate-500 dark:text-slate-500 pointer-events-none truncate">{{ game["video"] }}</p>
                 </li>
-            % end
         </ul>
     </div>
 
@@ -263,7 +284,7 @@
                 truncated: [false],
                 truncatable: [false],
                 texts: [
-                    htmlDecode(`{{ game["desc"] }}`),
+                    htmlDecode(`{{ game["desc"] or "None" }}`),
                 ],
                 setTruncate(index, element) {
                     if (element.offsetHeight < element.scrollHeight ||

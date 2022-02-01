@@ -42,31 +42,31 @@ def remove_prefix(text, prefix):
     return text
 
 def find_normalized(node, look):
-    if node.find(look) != None:
+    if node.find(look) != None and node.find(look).text != None:
         return fix_text(unescape(node.find(look).text))
     else:
         return False
 
 def find_float(node, look):
-    if node.find(look) != None:
+    if node.find(look) != None and node.find(look).text != None:
         return float(node.find(look).text)
     else:
         return False
 
 def find_int(node, look):
-    if node.find(look) != None:
+    if node.find(look) != None and node.find(look).text != None:
         return int(node.find(look).text)
     else:
         return False
 
 def find_image_path(node, look):
-    if node.find(look) != None:
+    if node.find(look) != None and node.find(look).text != None:
         return remove_prefix(node.find(look).text, "./images/")
     else:
         return False
 
 def find_video_path(node, look):
-    if node.find(look) != None:
+    if node.find(look) != None and node.find(look).text != None:
         return remove_prefix(node.find(look).text, "./videos/")
     else:
         return False
@@ -112,12 +112,15 @@ def find_screenshots(rom):
     return screenshots
 
 def getsize_fmt(path):
-    size = os.path.getsize(path)
-    for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
-        if abs(size) < 1024.0:
-            return f"{size:3.1f}{unit}b"
-        size /= 1024.0
-    return f"{size:.1f}Yib"
+    if os.path.isfile(path):
+        size = os.path.getsize(path)
+        for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
+            if abs(size) < 1024.0:
+                return f"{size:3.1f}{unit}b"
+            size /= 1024.0
+        return f"{size:.1f}Yib"
+    else:
+        return "0b"
 
 def map_system_folder(system):
     if system in system_map:
