@@ -49,7 +49,7 @@
                             <p class="text-white"><strong x-text="title"></strong></p>
                             <p class="mt-2 text-sm text-white" x-text="message"></p>
                         </div>
-                        <span x-show="!open" class="text-xs text-bold text-green-100 bg-green-600 p-1 px-2 rounded cursor-pointer" x-on:click="openGame();"><i class="fas fa-play pr-1"></i> Play</span>
+                        <span x-show="!open" class="text-xs text-bold text-emerald-100 bg-emerald-600 p-1 px-2 rounded cursor-pointer" x-on:click="openGame();"><i class="fas fa-play pr-1"></i> Play</span>
                         <span x-show="open" class="text-xs text-bold text-red-100 bg-red-600 p-1 px-2 rounded cursor-pointer" x-on:click="closeGame();"><i class="fas fa-stop pr-1"></i> Close</span>
                     </div>
                 </div>
