@@ -188,4 +188,9 @@ def assets():
     close_game()
 
 
+@route('/reloadgames')
+def assets():
+    reload_gameslist()
+
+
 run(host=host, port=port, reloader=reloader, debug=debug)

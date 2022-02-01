@@ -160,4 +160,6 @@
                 /
             % end
         % end
+
+        <a href="/reloadgames" title="Refresh Gamelist" x-on:click.prevent="fetch('/reloadgames').then(() => location.reload())" class="inline float-right"><i class="fas fa-sync"></i></a>
     </div>
