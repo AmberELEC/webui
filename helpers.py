@@ -13,8 +13,6 @@ except ModuleNotFoundError:
     def fix_text(text):
         return text
 
-from data import *
-
 def list_folders(path):
     dirs = []
     for entry in os.scandir(path):
