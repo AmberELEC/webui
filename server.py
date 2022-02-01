@@ -17,6 +17,8 @@ def index():
         systems.append({
             'fullname': find_normalized(system, 'fullname'),
             'name': find_normalized(system, 'name'),
+            'manufacturer': find_image_path(system, 'manufacturer'),
+            'folder': find_normalized_system_path(system, 'path'),
             'path': find_normalized(system, 'path'),
             'roms': len(list_files(system_folder_path))
         })
@@ -30,11 +32,8 @@ def index():
 @view('system')
 def view_system(system):
     es_systems = ElementTree.parse(es_systems_path).getroot()
-    root = ElementTree.parse(os.path.join(roms_folder, system, 'gamelist.xml')).getroot()
-    games = []
+    system_ele = es_systems.findall(".//system/[path=\"%s%s\"]" % (roms_folder, system))[0]
     system_info = { }
-
-    system_ele = es_systems.findall(".//system/[name=\"%s\"]" % system)[0]
 
     if system_ele:
         system_info = {
@@ -46,6 +45,14 @@ def view_system(system):
             'path': find_normalized(system_ele, 'path'),
             'extension': find_normalized(system_ele, 'extension')
         }
+
+    system_name = map_system_folder(system)
+
+    if not os.path.isfile(os.path.join(roms_folder, system, 'gamelist.xml')):
+        return template('empty_system', system=system, system_name=system_name, system_info=system_info)
+
+    root = ElementTree.parse(os.path.join(roms_folder, system, 'gamelist.xml')).getroot()
+    games = []
 
     for game in root.iter('game'):
         id = game.attrib.get('id')
@@ -61,8 +68,6 @@ def view_system(system):
             'genre': find_normalized(game, 'genre'),
             'path': rom_filename,
         })
-
-    system_name = map_system_folder(system)
 
     sorted_games = sorted(games, key=lambda k: (k['name']))
 

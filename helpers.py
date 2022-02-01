@@ -72,6 +72,9 @@ def find_video_path(node, look):
 def find_normalized_path(node, look):
     return remove_prefix(find_normalized(node, look), "./")
 
+def find_normalized_system_path(node, look):
+    return remove_prefix(find_normalized(node, look), roms_folder)
+
 def find_date(node, look):
     if find_normalized(node, look):
         return format_xml_date(find_normalized(node, look))
@@ -122,7 +125,7 @@ def getsize_fmt(path):
 
 def map_system_folder(system):
     es_systems = ElementTree.parse(es_systems_path).getroot()
-    system_ele = es_systems.findall(".//system/[name=\"%s\"]" % system)[0]
+    system_ele = es_systems.findall(".//system/[path=\"%s%s\"]" % (roms_folder, system))[0]
     if system_ele:
         return system_ele.find("fullname").text
     return system
