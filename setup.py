@@ -7,7 +7,7 @@ setup(name='351elec-webui',
       author='benphelps',
       author_email='bphelpsen@gmail.com',
       url='https://github.com/benphelps/351elec-webui',
-      license='MIT',
+      license='GPLv2+',
       platforms=['Linux'],
       install_requires=['ftfy']
 
