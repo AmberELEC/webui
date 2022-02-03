@@ -133,7 +133,7 @@ def getsize_fmt(path):
 
 def map_system_folder(system):
     es_systems = ElementTree.parse(es_systems_path).getroot()
-    system_ele = es_systems.findall(".//system/[path=\"%s%s\"]" % (roms_folder, system))[0]
+    system_ele = es_systems.find(".//system/[path=\"%s%s\"]" % (roms_folder, system))[0]
     if system_ele:
         return system_ele.find("fullname").text
     return system
