@@ -152,6 +152,9 @@ def http_get(url):
 def start_game(rom_path):
     http_post('/launch', rom_path)
 
+def reload_gameslist():
+    http_get('/reloadgames')
+
 def close_game():
     emu_kill()
 
