@@ -141,23 +141,13 @@ def map_system_folder(system):
 def normalize_path(path):
     return remove_prefix(path, "./")
 
-def http_post(path, body=""):
-    headers = { 'Content-type': 'text/plain', 'Accept': 'text/plain' }
-    conn = http.client.HTTPConnection('127.0.0.1', 1234)
-    conn.request('POST', path, body, headers)
-    response = conn.getresponse()
-    data = response.read()
-    conn.close()
-    return data
+def http_post(url, body=""):
+    call(["/bin/curl", "-X", "POST", "-d", body, "http://127.0.0.1:1234/%s" % remove_prefix(url, '/')])
+    return True
 
-def http_get(path, body=""):
-    headers = { 'Content-type': 'text/plain', 'Accept': 'text/plain' }
-    conn = http.client.HTTPConnection('127.0.0.1', 1234)
-    conn.request('GET', path, body, headers)
-    response = conn.getresponse()
-    data = response.read()
-    conn.close()
-    return data
+def http_get(url):
+    call(["/bin/curl", "-X", "GET", "http://127.0.0.1:1234/%s" % remove_prefix(url, '/')])
+    return True
 
 def start_game(rom_path):
     http_post('/launch', rom_path)
