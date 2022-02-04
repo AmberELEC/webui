@@ -133,7 +133,7 @@ def getsize_fmt(path):
 
 def map_system_folder(system):
     es_systems = ElementTree.parse(es_systems_path).getroot()
-    system_ele = es_systems.find(".//system/[path=\"%s%s\"]" % (roms_folder, system))[0]
+    system_ele = es_systems.findall(".//system[path=\"%s%s\"]" % (roms_folder, system))[0]
     if system_ele:
         return system_ele.find("fullname").text
     return system
@@ -142,11 +142,15 @@ def normalize_path(path):
     return remove_prefix(path, "./")
 
 def http_post(url, body=""):
-    call(["/bin/curl", "-X", "POST", "-d", body, "http://127.0.0.1:1234/%s" % remove_prefix(url, '/')])
+    if platform.system() == 'Darwin':
+        return False
+    subprocess.call(["/bin/curl", "-X", "POST", "-d", body, "http://127.0.0.1:1234/%s" % remove_prefix(url, '/')])
     return True
 
 def http_get(url):
-    call(["/bin/curl", "-X", "GET", "http://127.0.0.1:1234/%s" % remove_prefix(url, '/')])
+    if platform.system() == 'Darwin':
+        return False
+    subprocess.call(["/bin/curl", "-X", "GET", "http://127.0.0.1:1234/%s" % remove_prefix(url, '/')])
     return True
 
 def start_game(rom_path):

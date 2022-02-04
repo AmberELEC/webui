@@ -7,7 +7,7 @@
                         <img loading="lazy" :src="`/svg/${item.name}`" class="w-1/2 max-h-20 p-2" :alt="item.fullname">
                     </div>
 
-                    <div class="flex items-center justify-between border-t border-r border-b border-slate-200 dark:border-slate-900 bg-white dark:bg-slate-700 rounded-b-md truncate">
+                    <div class="flex items-center justify-between border-t border-r border-b border-slate-200 dark:border-slate-900 bg-slate-100 dark:bg-slate-700 rounded-b-md truncate">
                         <div class="flex-1 px-4 py-2 text-sm truncate">
                             <p x-text="item.fullname" class="text-slate-900 font-medium dark:text-slate-200"></p>
                             <p x-show="item.roms > 0" x-text="`${item.roms} ROMs`" class="text-xs text-slate-500 dark:text-slate-400"></p>
@@ -32,7 +32,9 @@
                     }
                     return this.data.filter((item) => {
                         return item.fullname.toLowerCase().includes(this.search.toLowerCase())
-                            || item.name.toLowerCase().includes(this.search.toLowerCase());
+                            || item.name.toLowerCase().includes(this.search.toLowerCase())
+                            || item.folder.toLowerCase().includes(this.search.toLowerCase())
+                            || item.manufacturer.toLowerCase().includes(this.search.toLowerCase());
                     });
                 },
             };

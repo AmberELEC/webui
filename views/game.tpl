@@ -26,7 +26,7 @@
             </div>
         </div>
 
-        <div class="bg-white dark:bg-slate-700 shadow dark:shadow-none overflow-hidden sm:rounded-lg">
+        <div class="bg-slate-100 dark:bg-slate-700 shadow dark:shadow-none overflow-hidden sm:rounded-lg">
             <div class="px-3 py-3 sm:px-3 bg-slate-700 dark:bg-slate-800 text-white">
                 <div class="grid grid-cols-2">
                     <div>
@@ -55,7 +55,7 @@
                 </div>
             </div>
             <div class="border-t border-slate-200 dark:border-slate-800 px-3 py-3 sm:p-0 dark:text-white">
-                <dl class="sm:divide-y sm:divide-slate-200 sm:dark:divide-slate-800">
+                <dl class="sm:divide-y sm:divide-slate-200 dark:divide-slate-800 sm:dark:divide-slate-800">
                     <div class="py-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4" x-data="texts()">
                         <dt class="text-sm font-medium text-slate-500 dark:text-white">
                             Description
@@ -63,11 +63,11 @@
                         <dd class="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2 dark:text-slate-300">
                             <template x-for="(text, index) in texts">
                                 <div>
-                                    <p class="line-clamp" x-text="text" x-init="$nextTick(() => { setTruncate(index, $el) })"></p>
+                                    <p class="line-clamp-6" x-text="text" x-init="$nextTick(() => { setTruncate(index, $el) })"></p>
                                     <template x-if="truncatable[index]">
                                         <div>
-                                            <button class="mt-2 underline text-slate-600 dark:text-slate-200" @click="event.target.parentNode.parentNode.querySelector('p').classList.remove('line-clamp'); truncated[index] = false;" x-show="truncated[index]">Read more...</button>
-                                            <button class="mt-2 underline text-slate-600 dark:text-slate-200" @click="event.target.parentNode.parentNode.querySelector('p').classList.add('line-clamp'); truncated[index] = true;" x-show="!truncated[index]">Read less...</button>
+                                            <button class="mt-2 underline text-slate-600 dark:text-slate-200" @click="event.target.parentNode.parentNode.querySelector('p').classList.remove('line-clamp-6'); truncated[index] = false;" x-show="truncated[index]">Read more...</button>
+                                            <button class="mt-2 underline text-slate-600 dark:text-slate-200" @click="event.target.parentNode.parentNode.querySelector('p').classList.add('line-clamp-6'); truncated[index] = true;" x-show="!truncated[index]">Read less...</button>
                                         </div>
                                     </template>
                                 </div>
@@ -120,7 +120,7 @@
 
                     <div class="py-4 px-4">
                         <span class="text-sm font-medium text-slate-500 dark:text-white block mb-1">ROMs</span>
-                        <ul role="list" class="border border-slate-200 dark:border-slate-800 rounded-md divide-y divide-slate-200">
+                        <ul role="list" class="bg-white dark:bg-slate-600 shadow-sm border border-slate-200 dark:border-slate-800 rounded-md divide-y divide-slate-200 dark:divide-slate-800">
                             <li class="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
                                 <div class="w-0 flex-1 flex items-center">
                                     <i class="far fa-sd-card"></i>
@@ -145,7 +145,7 @@
 
                         % if len(game["saves"]) > 0:
                             <span class="text-sm font-medium text-slate-500 dark:text-white block mb-1 mt-3">Saves</span>
-                            <ul role="list" class="border border-slate-200 dark:border-slate-800 rounded-md divide-y divide-slate-200 mb-3">
+                            <ul role="list" class="bg-white dark:bg-slate-600 shadow-sm border border-slate-200 dark:border-slate-800 rounded-md divide-y divide-slate-200 dark:divide-slate-800 mb-3">
                                 % for save in game["saves"]:
                                     <li class="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
                                         <div class="w-0 flex-1 flex items-center">
@@ -165,7 +165,7 @@
 
                         % if len(game["screenshots"]) > 0:
                             <span class="text-sm font-medium text-slate-500 dark:text-white block mb-1">Screenshots</span>
-                            <ul role="list" class="border border-slate-200 dark:border-slate-800 rounded-md divide-y divide-slate-200">
+                            <ul role="list" class="bg-white dark:bg-slate-600 shadow-sm border border-slate-200 dark:border-slate-800 rounded-md divide-y divide-slate-200 dark:divide-slate-800">
                                 % for screenshot in game["screenshots"]:
                                     <li class="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
                                         <div class="w-0 flex-1 flex items-center">

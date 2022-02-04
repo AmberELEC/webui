@@ -13,9 +13,10 @@
     % else:
         <title>351ELEC WebUI</title>
     % end
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,line-clamp"></script>
     <script src="https://unpkg.com/alpinejs" defer></script>
     <script src="https://kit.fontawesome.com/a72d7706c6.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.filesizejs.com/filesize.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -58,13 +59,6 @@
             font-display: swap;
         }
 
-        .line-clamp {
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 6;
-        }
-
         @media (prefers-color-scheme: dark) {
             .checkers {
                 background: repeating-conic-gradient(#0f172a 0% 25%, #1e293b 0% 50%) 50% / 20px 20px;
@@ -72,7 +66,6 @@
             .light .checkers {
                 background: repeating-conic-gradient(#64748b 0% 25%, #cbd5e1 0% 50%) 50% / 20px 20px;
             }
-
         }
 
         @media (prefers-color-scheme: light) {
@@ -82,6 +75,38 @@
             .dark .checkers {
                 background: repeating-conic-gradient(#0f172a 0% 25%, #1e293b 0% 50%) 50% / 20px 20px;
             }
+        }
+
+        .dark ::-webkit-scrollbar {
+            width: 14px;
+            height: 3px;
+            padding: 2px;
+        }
+        .dark ::-webkit-scrollbar-track-piece {
+            background-color: #475569; /* slate-600 */
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            height: 50px;
+            background-color: #1e293b; /* slate-800 */
+            background-clip: padding-box;
+            border-radius: 99px;
+            border: 3px solid rgba(0, 0, 0, 0);
+        }
+
+        .light ::-webkit-scrollbar {
+            width: 14px;
+            height: 3px;
+            padding: 2px;
+        }
+        .light ::-webkit-scrollbar-track-piece {
+            background-color: #e2e8f0; /* slate-200 */
+        }
+        .light ::-webkit-scrollbar-thumb {
+            height: 50px;
+            background-color: #475569; /* slate-600 */
+            background-clip: padding-box;
+            border-radius: 99px;
+            border: 3px solid rgba(0, 0, 0, 0);
         }
 
         :root {
@@ -115,6 +140,24 @@
         input[type="search"]::-webkit-search-results-button,
         input[type="search"]::-webkit-search-results-decoration { display: none; }
     </style>
+    <style type="text/tailwindcss">
+        @layer components {
+            .form-input {
+                @apply
+                    flex-1 block w-full
+                    focus:ring-slate-500
+                    focus:border-emerald-500
+                    dark:focus:border-emerald-400
+                    border-slate-400
+                    rounded-md
+                    sm:text-sm
+                    text-slate-800 dark:text-slate-300
+                    placeholder-slate-400 dark:placeholder-slate-500
+                    bg-slate-200 dark:bg-slate-700
+            }
+        }
+
+    </style>
 </head>
 <body class="dark:bg-slate-900 transform duration-200 ease-in-out">
 % if get('search', False):
@@ -140,16 +183,24 @@
                     </svg></span>
                 <input id="toggle" type="checkbox" class="hidden" :value="theme" @change="theme = (theme == 'dark' ? 'light' : 'dark')" />
             </div>
-            % if get('search', False):
-                <input
-                    x-ref="searchField"
-                    x-model="search"
-                    x-on:keydown.window.prevent.slash="$refs.searchField.focus()"
-                    placeholder="Search..."
-                    type="search"
-                    class="self-end justify-self-end w-1/2 flex text-slate-800 placeholder-slate-400 dark:text-slate-300 bg-slate-200 dark:bg-slate-700 dark:bg-slate-700 rounded-lg text-xs font-medium focus:outline-none p-2 px-3"
-                />
-            % end
+            <div class="w-full self-center flex justify-end justify-self-end items-center space-x-2">
+                % if get('actions', False):
+                    % for text, href in actions.items():
+                        <a class="text-emerald-100 bg-emerald-600 rounded-lg text-xs font-medium focus:outline-none p-2 px-3 cursor-pointer" href="{{ href }}">{{ text }}</a>
+                    % end
+                % end
+                % if get('search', False):
+                    <input
+                        x-ref="searchField"
+                        x-model="search"
+                        x-on:keydown.window.prevent.slash="$refs.searchField.focus()"
+                        placeholder="Search..."
+                        type="search"
+                        class="self-end justify-self-end w-1/2 flex text-slate-800 placeholder-slate-400 dark:text-slate-300 bg-slate-200 dark:bg-slate-700 dark:bg-slate-700 rounded-lg text-xs font-medium focus:outline-none p-2 px-3"
+                    />
+                % end
+            </div>
+
         </div>
     </div>
 

@@ -1,8 +1,9 @@
+from distutils import extension
 import os
 import json
 
 from urllib.parse import unquote
-from bottle import route, run, template, view, static_file, response, request
+from bottle import route, run, template, view, static_file, response, request, redirect
 from helpers import *
 from config import *
 
@@ -48,6 +49,27 @@ def view_game(system, game_ref):
     game = get_game_info(system, game_ref)
     system_name = map_system_folder(system)
     return dict(system=system, system_name=system_name, game=game, game_id=game_ref, running=emu_running())
+
+
+@route('/upload/<system>')
+def upload_rom(system):
+    if request.forms.get('submit'):
+        category   = request.forms.get('category')
+        upload     = request.files.get('upload')
+        name, ext = path.splitext(upload.filename)
+        if ext not in ('.png','.jpg','.jpeg'):
+            return 'File extension not allowed.'
+
+        save_path = get_save_path_for_category(category)
+        upload.save(save_path) # appends upload.filename automatically
+        return redirect('/')
+    else:
+        es_systems = ElementTree.parse(es_systems_path).getroot()
+        system_ele = es_systems.findall(".//system/[path=\"%s%s\"]" % (roms_folder, system))[0]
+        system_info = get_system_info(system_ele)
+        system_name = system_info["fullname"] or system
+        extensions = set([ext.lower() for ext in system_info["extension"].split(" ")])
+        return template('upload', system=system, system_name=system_name, extensions=extensions)
 
 
 @route('/svg/<system>')
