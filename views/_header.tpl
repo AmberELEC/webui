@@ -18,8 +18,45 @@
     <script src="https://kit.fontawesome.com/a72d7706c6.js" crossorigin="anonymous"></script>
     <script src="https://cdn.filesizejs.com/filesize.min.js"></script>
     <script>
+        if (!('themeColor' in localStorage)) {
+            localStorage.themeColor = 'slate';
+        }
+
         tailwind.config = {
             darkMode: 'class',
+            theme: {
+                colors: {
+                    // our themed override
+                    theme: tailwind.colors[localStorage.themeColor],
+
+                    // the default colors set
+                    transparent: tailwind.colors.transparent,
+                    black: tailwind.colors.black,
+                    white: tailwind.colors.white,
+                    slate: tailwind.colors.slate,
+                    gray: tailwind.colors.gray,
+                    zinc: tailwind.colors.zinc,
+                    neutral: tailwind.colors.neutral,
+                    stone: tailwind.colors.stone,
+                    red: tailwind.colors.red,
+                    orange: tailwind.colors.orange,
+                    amber: tailwind.colors.amber,
+                    yellow: tailwind.colors.yellow,
+                    lime: tailwind.colors.lime,
+                    green: tailwind.colors.green,
+                    emerald: tailwind.colors.emerald,
+                    teal: tailwind.colors.teal,
+                    cyan: tailwind.colors.cyan,
+                    sky: tailwind.colors.sky,
+                    blue: tailwind.colors.blue,
+                    indigo: tailwind.colors.indigo,
+                    violet: tailwind.colors.violet,
+                    purple: tailwind.colors.purple,
+                    fuchsia: tailwind.colors.fuchsia,
+                    pink: tailwind.colors.pink,
+                    rose: tailwind.colors.rose
+                },
+            },
         }
 
         function updateTheme(value) {
@@ -44,10 +81,46 @@
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
             updateTheme(event.matches ? "dark" : "light");
         });
+
+        function updateThemedColors(color) {
+            let root = document.documentElement;
+
+            tailwind.config.theme.colors.theme = tailwind.colors[color];
+            root.style.setProperty('--scrollbar-track-dark', tailwind.colors[color][600]);
+            root.style.setProperty('--scrollbar-thumb-dark', tailwind.colors[color][800]);
+            root.style.setProperty('--scrollbar-track-light', tailwind.colors[color][200]);
+            root.style.setProperty('--scrollbar-thumb-light', tailwind.colors[color][600]);
+            root.style.setProperty('--checkers-x-dark', tailwind.colors[color][900]);
+            root.style.setProperty('--checkers-y-dark', tailwind.colors[color][800]);
+            root.style.setProperty('--checkers-x-light', tailwind.colors[color][500]);
+            root.style.setProperty('--checkers-y-light', tailwind.colors[color][300]);
+            root.style.setProperty('--star-color', tailwind.colors[color][400]);
+            root.style.setProperty('--star-background', tailwind.colors[color][800]);
+
+            localStorage.themeColor = color;
+        }
+
+        updateThemedColors(localStorage.themeColor);
     </script>
     <style>
-        body {
+        html, body {
             overflow-x: hidden;
+            width: 100%;
+            height: 100%;
+        }
+
+        :root {
+            --scrollbar-track-dark: #475569; /* slate-600 */
+            --scrollbar-thumb-dark: #1e293b; /* slate-800 */
+            --scrollbar-track-light: #e2e8f0; /* slate-200 */
+            --scrollbar-thumb-light: #475569; /* slate-600 */
+            --checkers-x-dark: #0f172a; /* slate-900 */
+            --checkers-y-dark: #1e293b; /* slate-800 */
+            --checkers-x-light: #64748b; /* slate-500 */
+            --checkers-y-light: #cbd5e1; /* slate-300 */
+            --star-size: 20px;
+            --star-color: #94a3b8; /* slate-400 */
+            --star-background: #1e293b; /* slate-800 */
         }
 
         @font-face {
@@ -61,19 +134,19 @@
 
         @media (prefers-color-scheme: dark) {
             .checkers {
-                background: repeating-conic-gradient(#0f172a 0% 25%, #1e293b 0% 50%) 50% / 20px 20px;
+                background: repeating-conic-gradient(var(--checkers-x-dark) 0% 25%, var(--checkers-y-dark) 0% 50%) 50% / 20px 20px;
             }
             .light .checkers {
-                background: repeating-conic-gradient(#64748b 0% 25%, #cbd5e1 0% 50%) 50% / 20px 20px;
+                background: repeating-conic-gradient(var(--checkers-x-light) 0% 25%, var(--checkers-y-light) 0% 50%) 50% / 20px 20px;
             }
         }
 
         @media (prefers-color-scheme: light) {
             .checkers {
-                background: repeating-conic-gradient(#64748b 0% 25%, #cbd5e1 0% 50%) 50% / 20px 20px;
+                background: repeating-conic-gradient(var(--checkers-x-light) 0% 25%, var(--checkers-y-light) 0% 50%) 50% / 20px 20px;
             }
             .dark .checkers {
-                background: repeating-conic-gradient(#0f172a 0% 25%, #1e293b 0% 50%) 50% / 20px 20px;
+                background: repeating-conic-gradient(var(--checkers-x-dark) 0% 25%, var(--checkers-y-dark) 0% 50%) 50% / 20px 20px;
             }
         }
 
@@ -83,11 +156,11 @@
             padding: 2px;
         }
         .dark ::-webkit-scrollbar-track-piece {
-            background-color: #475569; /* slate-600 */
+            background-color: var(--scrollbar-track-dark); ; /* slate-600 */
         }
         .dark ::-webkit-scrollbar-thumb {
             height: 50px;
-            background-color: #1e293b; /* slate-800 */
+            background-color: var(--scrollbar-thumb-dark); /* slate-800 */
             background-clip: padding-box;
             border-radius: 99px;
             border: 3px solid rgba(0, 0, 0, 0);
@@ -99,20 +172,14 @@
             padding: 2px;
         }
         .light ::-webkit-scrollbar-track-piece {
-            background-color: #e2e8f0; /* slate-200 */
+            background-color: var(--scrollbar-track-light);
         }
         .light ::-webkit-scrollbar-thumb {
             height: 50px;
-            background-color: #475569; /* slate-600 */
+            background-color: var(--scrollbar-thumb-light); /* slate-600 */
             background-clip: padding-box;
             border-radius: 99px;
             border: 3px solid rgba(0, 0, 0, 0);
-        }
-
-        :root {
-            --star-size: 20px;
-            --star-color: #94a3b8;
-            --star-background: #1e293b;
         }
 
         .stars {
@@ -145,21 +212,21 @@
             .form-input {
                 @apply
                     flex-1 block w-full
-                    focus:ring-slate-500
+                    focus:ring-theme-500
                     focus:border-emerald-500
                     dark:focus:border-emerald-400
-                    border-slate-400
+                    border-theme-400
                     rounded-md
                     sm:text-sm
-                    text-slate-800 dark:text-slate-300
-                    placeholder-slate-400 dark:placeholder-slate-500
-                    bg-slate-200 dark:bg-slate-700
+                    text-theme-800 dark:text-theme-300
+                    placeholder-theme-400 dark:placeholder-theme-500
+                    bg-theme-200 dark:bg-theme-700
             }
         }
 
     </style>
 </head>
-<body class="dark:bg-slate-900 transform duration-200 ease-in-out">
+<body class="dark:bg-theme-900 bg-gradient-to-br from-theme-50 dark:from-theme-800 to-theme-100 dark:to-theme-900 transform duration-200 ease-in-out">
 % if get('search', False):
 <div x-data="load_search_data()" class="container mx-auto max-w-[1200px] p-5">
 % else:
@@ -167,21 +234,41 @@
 % end
     <div class="grid grid-cols-2 mb-5">
         <div class="col-span-1 grow h-20">
-            <a href="/"><img src="/svg/351-dark" alt="351ELEC" class="h-20 hidden dark:block"></a>
-            <a href="/"><img src="/svg/351-light" alt="351ELEC" class="h-20 block dark:hidden"></a>
+            <a href="/">
+                % include('_logo')
+            </a>
         </div>
         <div class="col-span-1 grid grid-rows-2">
             <div class="self-center flex justify-end justify-self-end items-center space-x-2">
-                <span class="text-sm text-slate-800 dark:text-slate-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <span class="text-sm text-theme-800 dark:text-theme-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg></span>
-                <label for="toggle" class="w-9 h-5 flex items-center bg-slate-300 rounded-full p-1 cursor-pointer duration-300 ease-in-out dark:bg-slate-600">
+                <label for="toggle" class="w-9 h-5 flex items-center bg-theme-300 rounded-full p-1 cursor-pointer duration-300 ease-in-out dark:bg-theme-600">
                     <div class="toggle-dot bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out dark:translate-x-3"></div>
                 </label>
-                <span class="text-sm text-slate-400 dark:text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <span class="text-sm text-theme-400 dark:text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg></span>
                 <input id="toggle" type="checkbox" class="hidden" :value="theme" @change="theme = (theme == 'dark' ? 'light' : 'dark')" />
+                <div class="pr-5">
+                    <div x-data="{
+                            selected: 'slate',
+                            colors: [
+                                'slate', 'gray', 'zinc', 'neutral', 'stone', 'red', 'orange', 'amber', 'yellow', 'lime', 'green',
+                                'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'
+                            ],
+                            picking: false
+                        }"
+                        x-init="$watch('selected', value => updateThemedColors(value))"
+                        class="relative">
+                        <i x-on:click="picking = !picking" class="fa-solid fa-palette text-theme-500"></i>
+                        <div x-show="picking" class="absolute grid grid-cols-11 gap-1 w-[250px] p-2 right-0 top-9 bg-theme-100 bg-opacity-50 shadow-md backdrop-blur rounded">
+                            <template x-for="color in colors">
+                                <div x-on:click="selected = color" class="cursor-pointer w-[20px] h-[20px] rounded-lg border border-2 relative" :class="`bg-${color}-500 border-${color}-600`">&nbsp;</div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="w-full self-center flex justify-end justify-self-end items-center space-x-2">
                 % if get('actions', False):
@@ -196,7 +283,7 @@
                         x-on:keydown.window.prevent.slash="$refs.searchField.focus()"
                         placeholder="Search..."
                         type="search"
-                        class="self-end justify-self-end w-1/2 flex text-slate-800 placeholder-slate-400 dark:text-slate-300 bg-slate-200 dark:bg-slate-700 dark:bg-slate-700 rounded-lg text-xs font-medium focus:outline-none p-2 px-3"
+                        class="self-end justify-self-end w-1/2 flex text-theme-800 placeholder-theme-400 dark:text-theme-300 bg-theme-200 dark:bg-theme-700 dark:bg-theme-700 rounded-lg text-xs font-medium focus:outline-none p-2 px-3"
                     />
                 % end
             </div>
@@ -204,7 +291,7 @@
         </div>
     </div>
 
-    <div class="text-slate-200 bg-slate-700 dark:bg-slate-700 rounded-lg text-xs font-medium uppercase tracking-wide p-2 px-3 mb-5">
+    <div class="text-theme-200 bg-theme-700 dark:bg-theme-700 rounded-lg text-xs font-medium uppercase tracking-wide p-2 px-3 mb-5">
         % for text, href in nav.items():
             <a href="{{ href }}">{{ text }}</a>
             % if list(nav)[-1] != text:

@@ -18,8 +18,8 @@ include('_header.tpl',
             </div>
         </li>
 
-        <li class="col-span-1 shadow dark:shadow-none bg-slate-700 dark:bg-slate-800 rounded-md grid content-center">
-            <span class="text-center text-xs text-bold uppercase text-slate-200 font-medium">Upload ROMs to see them here.</span>
+        <li class="col-span-1 shadow dark:shadow-none bg-theme-700 dark:bg-theme-800 rounded-md grid content-center">
+            <span class="text-center text-xs text-bold uppercase text-theme-200 font-medium">Upload ROMs to see them here.</span>
         </li>
     </ul>
 % include('_footer.tpl')
