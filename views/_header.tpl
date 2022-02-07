@@ -322,7 +322,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg></span>
                 <input id="toggle" type="checkbox" class="hidden" :value="theme" @change="theme = (theme == 'dark' ? 'light' : 'dark')" />
-                <!-- <div class="pr-5">
+                <div class="pr-5">
                     <div x-data="{
                             selected: 'slate',
                             colors: [
@@ -340,7 +340,7 @@
                             </template>
                         </div>
                     </div>
-                </div> -->
+                </div>
             </div>
             <div class="w-1/2 self-center flex justify-end justify-self-end items-center space-x-2">
                 % if get('actions', False):
