@@ -14,7 +14,6 @@
         <title>351ELEC WebUI</title>
     % end
     <script src="https://unpkg.com/alpinejs" defer></script>
-    <script src="https://cdn.jsdelivr.net/gh/mattkingshott/iodine@3/dist/iodine.min.js" defer></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,line-clamp"></script>
     <script src="https://kit.fontawesome.com/a72d7706c6.js" crossorigin="anonymous"></script>
     <script src="https://cdn.filesizejs.com/filesize.min.js"></script>

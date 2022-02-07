@@ -122,22 +122,4 @@ include('_header.tpl',
     </form>
 </div>
 
-<script>
-    let form = document.getElementById("form");
-
-    let inputs = [...form.querySelectorAll("input[data-rules]")];
-
-    function onSubmit(event) {
-        inputs.map((input) => {
-            if (Iodine.is(input.value, JSON.parse(input.dataset.rules)) !== true) {
-                event.preventDefault();
-                input.classList.add("invalid");
-            }
-        });
-    }
-
-    form.addEventListener("submit", onSubmit);
-
-</script>
-
 % include('_footer.tpl')
