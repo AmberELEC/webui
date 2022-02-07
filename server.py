@@ -3,9 +3,11 @@ import os
 import json
 
 from urllib.parse import unquote
-from bottle import route, run, template, view, static_file, response, request, redirect
+
+from bottle import route, get, post, run, template, view, static_file, response, request, redirect
 from helpers import *
 from config import *
+from xml.etree.ElementTree import SubElement, Element
 
 @route('/')
 @view('index')
@@ -51,18 +53,139 @@ def view_game(system, game_ref):
     return dict(system=system, system_name=system_name, game=game, game_id=game_ref, running=emu_running())
 
 
-@route('/upload/<system>')
+@route('/edit/<system>/<game_ref:int>')
+@route('/edit/<system>/<game_ref:path>')
+def edit(system, game_ref):
+    game = get_game_info(system, game_ref)
+    es_systems = ElementTree.parse(es_systems_path).getroot()
+    system_ele = es_systems.findall(".//system/[path=\"%s%s\"]" % (roms_folder, system))[0]
+    system_info = get_system_info(system_ele)
+    system_name = system_info["fullname"] or system
+    extensions = set([ext.lower() for ext in system_info["extension"].split(" ")])
+
+    files = { }
+
+    if game['path']:
+        files['rom'] = json.dumps({ 'name': game['path'], 'size': game['size_raw'], 'type': 'application/binary' })
+
+    if game['image']:
+        files['image'] = json.dumps({ 'name': game['image'], 'size': game['image_size'], 'type': 'image/png' })
+
+    if game['marquee']:
+        files['marquee'] = json.dumps({ 'name': game['marquee'], 'size': game['marquee_size'], 'type': 'image/png' })
+
+    if game['thumbnail']:
+        files['thumbnail'] = json.dumps({ 'name': game['thumbnail'], 'size': game['thumbnail_size'], 'type': 'image/png' })
+
+    if game['video']:
+        files['video'] = json.dumps({ 'name': game['video'], 'size': game['video_size'], 'type': 'video/mp4' })
+
+    return template('upload', system=system, system_name=system_name, extensions=extensions, game=game, files=files)
+
+
+@get('/upload/<system>')
+@post('/upload/<system>')
 def upload_rom(system):
     if request.forms.get('submit'):
-        category   = request.forms.get('category')
-        upload     = request.files.get('upload')
-        name, ext = path.splitext(upload.filename)
-        if ext not in ('.png','.jpg','.jpeg'):
-            return 'File extension not allowed.'
+        gamelist = os.path.join(roms_folder, system, 'gamelist.xml')
 
-        save_path = get_save_path_for_category(category)
-        upload.save(save_path) # appends upload.filename automatically
-        return redirect('/')
+        if os.path.isfile(gamelist):
+            tree = ElementTree.parse(gamelist)
+            root = tree.getroot()
+        else:
+            root = Element('gameList')
+            tree = ElementTree(root)
+
+        # files
+        rom = request.files.get('rom', False)
+        marquee = request.files.get('marquee', False)
+        screenshot = request.files.get('screenshot', False)
+        boxart = request.files.get('boxart', False)
+        video = request.files.get('video', False)
+
+        # midstate
+        existing_rom = request.forms.get('existing_rom', False)
+
+        # metadata
+        name = request.forms.get('name', False)
+        publisher = request.forms.get('publisher', False)
+        developer = request.forms.get('developer', False)
+        published = request.forms.get('published', False)
+        genre = request.forms.get('genre', False)
+        players = request.forms.get('players', False)
+        region = request.forms.get('region', False)
+        rating = request.forms.get('rating', False)
+        description = request.forms.get('description', False)
+
+        # resolve rom path, look for existing entry
+        if rom != False and rom.filename != 'empty':
+            if root.find(".//game/[path=\"./%s\"]" % rom.raw_filename):
+                game = root.find(".//game/[path=\"./%s\"]" % rom.raw_filename)
+            else:
+                game = SubElement(root, 'game')
+                entry = SubElement(game, 'path')
+                entry.text = "./%s" % rom.raw_filename
+            rom_filename = rom.raw_filename
+        elif existing_rom:
+            game = root.find(".//game/[path=\"./%s\"]" % existing_rom)
+            rom_filename = existing_rom
+        else:
+            return redirect('/')
+
+        if name:
+            update_game_entry(game, 'name', name)
+        else:
+            update_game_entry(game, 'name', os.path.splitext(rom.raw_filename)[0])
+
+        if publisher:
+            update_game_entry(game, 'publisher', publisher)
+
+        if developer:
+            update_game_entry(game, 'developer', developer)
+
+        if published:
+            update_game_entry(game, 'releasedate', date_to_xml(published))
+
+        if genre:
+            update_game_entry(game, 'genre', genre)
+
+        if players:
+            update_game_entry(game, 'players', players)
+
+        if region:
+            update_game_entry(game, 'region', region)
+
+        if rating:
+            update_game_entry(game, 'rating', int(rating) / 100)
+
+        if description:
+            update_game_entry(game, 'desc', description)
+
+        if rom and rom.filename != 'empty':
+            rom.save(system_path(system, rom.raw_filename), overwrite=True)
+
+        if marquee and marquee.filename != 'empty':
+            update_game_entry(game, 'marquee', "./images/%s" % marquee.raw_filename)
+            marquee.save(system_path(system, 'images', marquee.raw_filename), overwrite=True)
+
+        if screenshot and screenshot.filename != 'empty':
+            update_game_entry(game, 'image', "./images/%s" % screenshot.raw_filename)
+            screenshot.save(system_path(system, 'images', screenshot.raw_filename), overwrite=True)
+
+        if boxart and boxart.filename != 'empty':
+            update_game_entry(game, 'thumbnail', "./images/%s" % boxart.raw_filename)
+            boxart.save(system_path(system, 'images', boxart.raw_filename), overwrite=True)
+
+        if video and video.filename != 'empty':
+            update_game_entry(game, 'video', "./videos/%s" % boxart.raw_filename)
+            video.save(system_path(system, 'videos', boxart.raw_filename), overwrite=True)
+
+        with open(gamelist, 'wb') as file:
+            tree.write(file)
+
+        game_id = game.attrib.get('id')
+
+        return redirect('/system/%s/%s' % (system, game_id if game_id else rom_filename))
     else:
         es_systems = ElementTree.parse(es_systems_path).getroot()
         system_ele = es_systems.findall(".//system/[path=\"%s%s\"]" % (roms_folder, system))[0]

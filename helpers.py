@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ElementTree
 
 from html import unescape
 from config import *
+from xml.etree.ElementTree import SubElement, Element
 
 try:
     from ftfy import fix_text
@@ -83,14 +84,29 @@ def find_normalized_path(node, look):
 def find_normalized_system_path(node, look):
     return remove_prefix(find_normalized(node, look), roms_folder)
 
+def system_path(system, *paths):
+    return os.path.join(os.path.abspath(roms_folder), system, *paths)
+
 def find_date(node, look):
     if find_normalized(node, look):
         return format_xml_date(find_normalized(node, look))
     else:
         return False
 
+def find_date_form(node, look):
+    if find_normalized(node, look):
+        return format_xml_date_form(find_normalized(node, look))
+    else:
+        return False
+
 def format_xml_date(date):
     return datetime.datetime.strptime(date, '%Y%m%dT%H%M%S').strftime('%d %B %Y')
+
+def format_xml_date_form(date):
+    return datetime.datetime.strptime(date, '%Y%m%dT%H%M%S').strftime('%Y-%m-%d')
+
+def date_to_xml(date):
+    return datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%dT%H%M%S')
 
 def find_saves(system, rom):
     saves = []
@@ -218,14 +234,28 @@ def get_game_info(system, game_ref):
                 'rating': find_float(ele, 'rating'),
                 'path': find_normalized_path(ele, 'path'),
                 'releasedate': find_date(ele, 'releasedate'),
+                'releasedate_form': find_date_form(ele, 'releasedate'),
                 'lastplayed': find_date(ele, 'lastplayed'),
                 'playcount': find_int(ele, 'playcount'),
                 'gametime': find_int(ele, 'gametime'),
                 'size': getsize_fmt(rom_path),
+                'size_raw': os.path.getsize(rom_path),
                 'have_rom': os.path.isfile(rom_path),
                 'saves': find_saves(system, rom_filename),
                 'screenshots': find_screenshots(rom_filename)
             }
+
+            if game["image"]:
+                game["image_size"] = os.path.getsize(os.path.join(roms_folder, system, 'images', find_image_path(ele, 'image')))
+
+            if game["thumbnail"]:
+                game["thumbnail_size"] = os.path.getsize(os.path.join(roms_folder, system, 'images', find_image_path(ele, 'thumbnail')))
+
+            if game["marquee"]:
+                game["marquee_size"] = os.path.getsize(os.path.join(roms_folder, system, 'images', find_image_path(ele, 'marquee')))
+
+            if game["video"]:
+                game["video_size"] = os.path.getsize(os.path.join(roms_folder, system, 'videos', find_video_path(ele, 'video')))
 
             return game
 
@@ -244,13 +274,19 @@ def get_game_info(system, game_ref):
             'thumbnail': False,
             'marquee': False,
             'video': False,
+            'image_size': 0,
+            'thumbnail_size': 0,
+            'marquee_size': 0,
+            'video_size': 0,
             'rating': False,
             'path': os.path.basename(rom_path),
             'releasedate': False,
+            'releasedate_form': False,
             'lastplayed': False,
             'playcount': False,
             'gametime': False,
             'size': getsize_fmt(rom_path),
+            'size_raw': os.path.getsize(rom_path),
             'have_rom': True,
             'saves': find_saves(system, rom_path),
             'screenshots': find_screenshots(rom_path),
@@ -305,3 +341,11 @@ def list_roms(system_ele):
             })
 
     return roms
+
+def update_game_entry(game, name, value):
+    if value != False and value != None:
+        if game.find(name) != None:
+            game.find(name).text = value
+        else:
+            entry = SubElement(game, name)
+            entry.text = value

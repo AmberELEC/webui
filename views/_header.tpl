@@ -13,13 +13,15 @@
     % else:
         <title>351ELEC WebUI</title>
     % end
-    <script src="https://cdn.tailwindcss.com?plugins=forms,line-clamp"></script>
     <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/mattkingshott/iodine@3/dist/iodine.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,line-clamp"></script>
     <script src="https://kit.fontawesome.com/a72d7706c6.js" crossorigin="anonymous"></script>
     <script src="https://cdn.filesizejs.com/filesize.min.js"></script>
     <script>
-        if (!('themeColor' in localStorage)) {
+        if (!('themeColor' in localStorage) || !('accentColor' in localStorage)) {
             localStorage.themeColor = 'slate';
+            localStorage.accentColor = 'emerald';
         }
 
         tailwind.config = {
@@ -28,6 +30,7 @@
                 colors: {
                     // our themed override
                     theme: tailwind.colors[localStorage.themeColor],
+                    accent: tailwind.colors[localStorage.accentColor],
 
                     // the default colors set
                     transparent: tailwind.colors.transparent,
@@ -81,11 +84,11 @@
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
             updateTheme(event.matches ? "dark" : "light");
         });
-
         function updateThemedColors(color) {
             let root = document.documentElement;
 
             tailwind.config.theme.colors.theme = tailwind.colors[color];
+
             root.style.setProperty('--scrollbar-track-dark', tailwind.colors[color][600]);
             root.style.setProperty('--scrollbar-thumb-dark', tailwind.colors[color][800]);
             root.style.setProperty('--scrollbar-track-light', tailwind.colors[color][200]);
@@ -94,8 +97,11 @@
             root.style.setProperty('--checkers-y-dark', tailwind.colors[color][800]);
             root.style.setProperty('--checkers-x-light', tailwind.colors[color][500]);
             root.style.setProperty('--checkers-y-light', tailwind.colors[color][300]);
-            root.style.setProperty('--star-color', tailwind.colors[color][400]);
-            root.style.setProperty('--star-background', tailwind.colors[color][800]);
+            root.style.setProperty('--star-color', tailwind.colors[color][600]);
+            root.style.setProperty('--star-background', tailwind.colors[color][300]);
+            root.style.setProperty('--star-color-dark', tailwind.colors[color][300]);
+            root.style.setProperty('--star-background-dark', tailwind.colors[color][600]);
+
 
             localStorage.themeColor = color;
         }
@@ -119,8 +125,8 @@
             --checkers-x-light: #64748b; /* slate-500 */
             --checkers-y-light: #cbd5e1; /* slate-300 */
             --star-size: 20px;
-            --star-color: #94a3b8; /* slate-400 */
-            --star-background: #1e293b; /* slate-800 */
+            --star-color: #1e293b; /* slate-800 */
+            --star-background: #94a3b8; /* slate-400 */
         }
 
         @font-face {
@@ -193,12 +199,23 @@
         .stars::before {
             content: '★★★★★';
             letter-spacing: 3px;
-            background: linear-gradient(90deg, var(--star-background) var(--percent), var(--star-color) var(--percent));
+            background: linear-gradient(90deg, var(--star-color-dark) var(--percent), var(--star-background-dark) var(--percent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             text-fill-color: transparent;
         }
+
+        .light .stars::before {
+            content: '★★★★★';
+            letter-spacing: 3px;
+            background: linear-gradient(90deg, var(--star-color) var(--percent), var(--star-background) var(--percent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+
 
         input[type=search]::-ms-clear { display: none; width : 0; height: 0; }
         input[type=search]::-ms-reveal { display: none; width : 0; height: 0; }
@@ -207,16 +224,72 @@
         input[type="search"]::-webkit-search-results-button,
         input[type="search"]::-webkit-search-results-decoration { display: none; }
     </style>
+    <style>
+        .rating {
+            --dir: right;
+            --fill: var(--star-color-dark);
+            --fillbg: var(--star-background-dark);
+            --heart: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 21.328l-1.453-1.313q-2.484-2.25-3.609-3.328t-2.508-2.672-1.898-2.883-0.516-2.648q0-2.297 1.57-3.891t3.914-1.594q2.719 0 4.5 2.109 1.781-2.109 4.5-2.109 2.344 0 3.914 1.594t1.57 3.891q0 1.828-1.219 3.797t-2.648 3.422-4.664 4.359z"/></svg>');
+            --star: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.25l-6.188 3.75 1.641-7.031-5.438-4.734 7.172-0.609 2.813-6.609 2.813 6.609 7.172 0.609-5.438 4.734 1.641 7.031z"/></svg>');
+            --stars: 5;
+            --starsize: 2rem;
+            --symbol: var(--star);
+            --value: 1;
+            --w: calc(var(--stars) * var(--starsize));
+            --x: calc(100% * (var(--value) / var(--stars)));
+            block-size: var(--starsize);
+            inline-size: var(--w);
+            position: relative;
+            touch-action: manipulation;
+            -webkit-appearance: none;
+            background: transparent;
+        }
+
+        .light .rating {
+            --fill: var(--star-color);
+            --fillbg: var(--star-background);
+        }
+
+        [dir="rtl"] .rating {
+            --dir: left;
+        }
+        .rating::-moz-range-track {
+            background: linear-gradient(to var(--dir), var(--fill) 0 var(--x), var(--fillbg) 0 var(--x));
+            block-size: 100%;
+            mask: repeat left center/var(--starsize) var(--symbol);
+        }
+        .rating::-webkit-slider-runnable-track {
+            background: linear-gradient(to var(--dir), var(--fill) 0 var(--x), var(--fillbg) 0 var(--x));
+            block-size: 100%;
+            mask: repeat left center/var(--starsize) var(--symbol);
+            -webkit-mask: repeat left center/var(--starsize) var(--symbol);
+        }
+        .rating::-moz-range-thumb {
+            height: var(--starsize);
+            opacity: 0;
+            width: var(--starsize);
+        }
+        .rating::-webkit-slider-thumb {
+            height: var(--starsize);
+            opacity: 0;
+            width: var(--starsize);
+            -webkit-appearance: none;
+        }
+        .rating, .rating-label {
+            display: block;
+        }
+    </style>
     <style type="text/tailwindcss">
         @layer components {
             .form-input {
                 @apply
                     flex-1 block w-full
                     focus:ring-theme-500
-                    focus:border-emerald-500
-                    dark:focus:border-emerald-400
+                    focus:border-accent-500
+                    dark:focus:border-accent-400
                     border-theme-400
                     rounded-md
+                    shadow-sm
                     sm:text-sm
                     text-theme-800 dark:text-theme-300
                     placeholder-theme-400 dark:placeholder-theme-500
@@ -250,7 +323,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg></span>
                 <input id="toggle" type="checkbox" class="hidden" :value="theme" @change="theme = (theme == 'dark' ? 'light' : 'dark')" />
-                <div class="pr-5">
+                <!-- <div class="pr-5">
                     <div x-data="{
                             selected: 'slate',
                             colors: [
@@ -268,12 +341,12 @@
                             </template>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
-            <div class="w-full self-center flex justify-end justify-self-end items-center space-x-2">
+            <div class="w-1/2 self-center flex justify-end justify-self-end items-center space-x-2">
                 % if get('actions', False):
                     % for text, href in actions.items():
-                        <a class="text-emerald-100 bg-emerald-600 rounded-lg text-xs font-medium focus:outline-none p-2 px-3 cursor-pointer" href="{{ href }}">{{ text }}</a>
+                        <a class="text-accent-100 bg-accent-600 rounded-lg text-xs font-medium focus:outline-none p-1.5 px-2 cursor-pointer border border-transparent" href="{{ href }}">{{ text }}</a>
                     % end
                 % end
                 % if get('search', False):
@@ -283,7 +356,7 @@
                         x-on:keydown.window.prevent.slash="$refs.searchField.focus()"
                         placeholder="Search..."
                         type="search"
-                        class="self-end justify-self-end w-1/2 flex text-theme-800 placeholder-theme-400 dark:text-theme-300 bg-theme-200 dark:bg-theme-700 dark:bg-theme-700 rounded-lg text-xs font-medium focus:outline-none p-2 px-3"
+                        class="form-input self-end justify-self-end w-1/2 flex text-xs p-1.5 px-2"
                     />
                 % end
             </div>

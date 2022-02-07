@@ -6,7 +6,7 @@
             '/system/%s' % system,
             '/system/%s/%s' % (system, game_id)
         )
-    )))
+    )), actions={ 'Edit ROM': '/edit/%s/%s' % (system, game_id)  })
 %>
     <div x-data="{ show_modal: false, modal_src: '' }" @keydown.escape="show_modal = false"  class="mt-3 grid grid-cols-1 gap-5 lg:gap-6 lg:grid-cols-2">
         <div
@@ -49,7 +49,7 @@
                             <p class="text-white"><strong x-text="title"></strong></p>
                             <p class="mt-2 text-sm text-white" x-text="message"></p>
                         </div>
-                        <span x-show="!open" class="text-xs text-bold text-emerald-100 bg-emerald-600 p-1 px-2 rounded cursor-pointer" x-on:click="openGame();"><i class="fas fa-play pr-1"></i> Play</span>
+                        <span x-show="!open" class="text-xs text-bold text-accent-100 bg-accent-600 p-1 px-2 rounded cursor-pointer" x-on:click="openGame();"><i class="fas fa-play pr-1"></i> Play</span>
                         <span x-show="open" class="text-xs text-bold text-red-100 bg-red-600 p-1 px-2 rounded cursor-pointer" x-on:click="closeGame();"><i class="fas fa-stop pr-1"></i> Close</span>
                     </div>
                 </div>
@@ -175,7 +175,7 @@
                                             </span>
                                         </div>
                                         <div class="ml-4 flex-shrink-0">
-                                            <a x-on:click="if (!confirm('Are you sure you want to delete this file?')) $event.preventDefault()" href="/screenshots/{{ screenshot }}/delete"><i class="text-red-600 dark:text-red-300  fas fa-trash pr-1"></i></a>
+                                            <!-- <a x-on:click="if (!confirm('Are you sure you want to delete this file?')) $event.preventDefault()" href="/screenshots/{{ screenshot }}/delete"><i class="text-red-600 dark:text-red-300  fas fa-trash pr-1"></i></a> -->
                                             <a @click="show_modal = true; modal_src = '/screenshots/{{ screenshot }}';" class="font-medium underline text-theme-600 hover:text-theme-500 dark:text-theme-200 dark:hover:text-theme-300 cursor-pointer"><i class="fas fa-eye"></i></a>
                                         </div>
                                     </li>
@@ -188,7 +188,6 @@
         </div>
 
         <ul role="list" class="grid grid-cols-1 md:grid-cols-2 gap-0 mx-auto">
-
                 <li class="relative pr-3 pb-3 flex flex-col">
                     <div class="flex checkers grow group block w-full aspect-w-10 aspect-h-7 rounded-lg bg-theme-100 overflow-hidden cursor-pointer">
                         % if game["marquee"]:
