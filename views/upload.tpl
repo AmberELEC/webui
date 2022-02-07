@@ -8,13 +8,34 @@ include('_header.tpl',
     <form id="form" action="/upload/{{ system }}" method="POST" enctype="multipart/form-data">
         <div class="shadow dark:shadow-none sm:rounded-md sm:overflow-hidden">
             <div class="px-4 py-5 bg-theme-100 dark:bg-theme-800 sm:p-6 grid grid-cols-6 gap-6">
-                <div class="col-span-6">
+                <div class="col-span-6" x-data="{ rom_file: false }">
                     <label class="block text-sm font-medium text-theme-700 dark:text-theme-300">ROM File</label>
                     % if get('files', False):
                         % include('_fileupload.tpl', name='rom', extensions=' '.join(extensions), accept=','.join(extensions), existing = files['rom'] if get('files', False) else 'null')
                         <input type="hidden" name="existing_rom" value="{{ game["path"] }}">
                     % else:
                         % include('_fileupload.tpl', name='rom', extensions=' '.join(extensions), accept=','.join(extensions), required=True)
+                        <div id="exists" style="display: none;" class="text-sm shadow dark:shadow-none sm:rounded-md bg-rose-500 text-rose-100 p-4 py-2 mt-2">
+                            It looks like you're trying to upload a rom that already exists, would you like to <a id="edit-existing" href="#" class="underline font-bold">edit that rom instead</a>?  Please note, duplicate roms will be merged into a single entry.
+                        </div>
+                        <script>
+                            const selectElement = document.querySelector('#rom');
+                            selectElement.addEventListener('change', (event) => {
+                                const files = event.target.files;
+                                const file = files[0];
+                                fetch(`/exists/{{ system }}/${file.name}`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        console.log(data.exists);
+                                        if (data.exists === true) {
+                                            document.querySelector('#exists').style.display = 'block';
+                                            document.querySelector('#edit-existing').href = `/edit/{{ system }}/${data.as}`;
+                                        } else {
+                                            // nothing
+                                        }
+                                    });
+                            });
+                        </script>
                     % end
                 </div>
 

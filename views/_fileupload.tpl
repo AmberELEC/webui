@@ -3,9 +3,10 @@
 </script>
 <div x-data="{ files: {{ name }}_data }" id="file_upload_{{ name }}" class="mt-1 block w-full px-6 pt-5 pb-6 relative border border-theme-400 dark:border-theme-500 text-theme-800 placeholder-theme-400 dark:text-theme-300 bg-theme-200 dark:bg-theme-700 border-dashed rounded-md">
     <input type="file" name="{{ name }}"
+            id="{{ name }}"
             class="absolute inset-0 z-50 m-0 p-0 w-full h-full outline-none opacity-0 cursor-pointer"
             accept={{accept}}
-            x-on:change="files = $event.target.files; console.log($event.target.files);"
+            x-on:change="files = $event.target.files;"
             x-on:dragover="$el.classList.add('active')" x-on:dragleave="$el.classList.remove('active')" x-on:drop="$el.classList.remove('active')"
             % if get('required', False):
             required="required"

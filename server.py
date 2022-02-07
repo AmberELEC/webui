@@ -83,6 +83,20 @@ def edit(system, game_ref):
     return template('upload', system=system, system_name=system_name, extensions=extensions, game=game, files=files)
 
 
+@route('/exists/<system>/<rom>')
+def exists(system, rom):
+    gamelist = os.path.join(roms_folder, system, 'gamelist.xml')
+
+    if os.path.isfile(gamelist):
+        root = ElementTree.parse(gamelist).getroot()
+        ele = root.find(".//game/[path=\"./%s\"]" % unescape(rom))
+        if ele != None:
+            info = get_game_info(system, rom)
+            return { 'exists': True, 'as': info['id'] }
+
+    return { 'exists': False }
+
+
 @get('/upload/<system>')
 @post('/upload/<system>')
 def upload_rom(system):

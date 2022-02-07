@@ -219,6 +219,7 @@ def get_game_info(system, game_ref):
             rom_path = os.path.join(roms_folder, system, rom_filename)
 
             game = {
+                'id': ele.attrib.get('id', False) or rom_filename,
                 'name': find_normalized(ele, 'name'),
                 'desc': find_normalized(ele, 'desc'),
                 'developer': find_normalized(ele, 'developer'),
@@ -262,6 +263,7 @@ def get_game_info(system, game_ref):
     rom_path = os.path.join(roms_folder, system, unescape(game_ref))
     if os.path.isfile(rom_path):
         game = {
+            'id': game_ref,
             'name': game_ref,
             'desc': False,
             'developer': False,
