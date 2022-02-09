@@ -8,6 +8,7 @@ from bottle import route, get, post, run, template, view, static_file, response,
 from helpers import *
 from config import *
 from xml.etree.ElementTree import SubElement, Element
+from xml.etree.ElementTree import ElementTree as ET
 
 @route('/')
 @view('index')
@@ -108,7 +109,6 @@ def upload_rom(system):
             root = tree.getroot()
         else:
             root = Element('gameList')
-            tree = ElementTree(root)
 
         # files
         rom = request.files.get('rom', False)
@@ -195,7 +195,7 @@ def upload_rom(system):
             video.save(system_path(system, 'videos', boxart.raw_filename), overwrite=True)
 
         with open(gamelist, 'wb') as file:
-            tree.write(file)
+            ET(root).write(file, encoding='utf-8', xml_declaration=True)
 
         game_id = game.attrib.get('id')
 
