@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ElementTree
 from html import unescape
 from config import *
 from xml.etree.ElementTree import SubElement, Element
+from uuid import UUID
 
 try:
     from ftfy import fix_text
@@ -210,6 +211,8 @@ def get_game_info(system, game_ref):
 
         if game_ref.isdigit():
             ele = root.find(".//game[@id='%s']" % game_ref)
+        elif is_valid_uuid(game_ref):
+            ele = root.find(".//game[@id='%s']" % game_ref)
         else:
             ele = root.find(".//game/[path=\"./%s\"]" % unescape(game_ref))
 
@@ -351,3 +354,10 @@ def update_game_entry(game, name, value):
         else:
             entry = SubElement(game, name)
             entry.text = value
+
+def is_valid_uuid(val):
+    try:
+        UUID(str(val))
+        return True
+    except ValueError:
+        return False

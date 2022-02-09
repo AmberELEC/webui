@@ -9,6 +9,7 @@ from helpers import *
 from config import *
 from xml.etree.ElementTree import SubElement, Element
 from xml.etree.ElementTree import ElementTree as ET
+from uuid import uuid4
 
 @route('/')
 @view('index')
@@ -136,7 +137,7 @@ def upload_rom(system):
             if root.find(".//game/[path=\"./%s\"]" % rom.raw_filename):
                 game = root.find(".//game/[path=\"./%s\"]" % rom.raw_filename)
             else:
-                game = SubElement(root, 'game')
+                game = SubElement(root, 'game', attrib={ 'id': str(uuid4()) })
                 entry = SubElement(game, 'path')
                 entry.text = "./%s" % rom.raw_filename
             rom_filename = rom.raw_filename
