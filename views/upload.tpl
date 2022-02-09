@@ -99,13 +99,14 @@ include('_header.tpl',
                 <div class="col-span-6 sm:col-span-2">
                     <label for="rating" class="rating-label block text-sm font-medium text-theme-700 dark:text-theme-300">Rating
                         <input
-                          class="rating mt-1.5"
-                          max="5"
-                          oninput="this.style.setProperty('--value', `${this.valueAsNumber}`)"
-                          step="0.25"
-                          style="--value:{{ (game["rating"] or 0) * 5 if get('game', False) else 0 }}"
-                          type="range"
-                          value="{{ (game["rating"] or 0) * 5 if get('game', False) else 0 }}">
+                            name="rating"
+                            class="rating mt-1.5"
+                            max="5"
+                            oninput="this.style.setProperty('--value', `${this.valueAsNumber}`)"
+                            step="0.1"
+                            style="--value:{{ (game["rating"] or 0) * 5 if get('game', False) else 0 }}"
+                            type="range"
+                            value="{{ (game["rating"] or 0) * 5 if get('game', False) else 0 }}">
                       </label>
                 </div>
 
