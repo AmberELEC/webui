@@ -171,7 +171,7 @@ def upload_rom(system):
             update_game_entry(game, 'region', region)
 
         if rating:
-            update_game_entry(game, 'rating', int(rating) / 5)
+            update_game_entry(game, 'rating', str(float(rating) / 5))
 
         if description:
             update_game_entry(game, 'desc', description)
