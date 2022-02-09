@@ -12,7 +12,7 @@ include('_header.tpl',
                     <label class="block text-sm font-medium text-theme-700 dark:text-theme-300">ROM File</label>
                     % if get('files', False):
                         % include('_fileupload.tpl', name='rom', extensions=' '.join(extensions), accept=','.join(extensions), existing = files['rom'] if get('files', False) else 'null')
-                        <input type="hidden" name="existing_rom" value="{{ game["path"] }}">
+                        <input type="hidden" name="existing_rom" value="{{ game["path"] or "" }}">
                     % else:
                         % include('_fileupload.tpl', name='rom', extensions=' '.join(extensions), accept=','.join(extensions), required=True)
                         <div id="exists" style="display: none;" class="text-sm shadow dark:shadow-none sm:rounded-md bg-rose-500 text-rose-100 p-4 py-2 mt-2">
@@ -50,49 +50,49 @@ include('_header.tpl',
                 <div class="col-span-6">
                     <label for="name" class="block text-sm font-medium text-theme-700 dark:text-theme-300">Name</label>
                     <div class="mt-1 flex">
-                        <input type="text" name="name" id="name" class="form-input" placeholder="Battletoads" value="{{ game["name"] if get('game', False) else "" }}">
+                        <input type="text" name="name" id="name" class="form-input" placeholder="Battletoads" value="{{ game["name"] or "" if get('game', False) else "" }}">
                     </div>
                 </div>
 
                 <div class="col-span-6 sm:col-span-2">
                     <label for="publisher" class="block text-sm font-medium text-theme-700 dark:text-theme-300">Publisher</label>
                     <div class="mt-1 flex">
-                        <input type="text" name="publisher" id="publisher" class="form-input" placeholder="Tradewest" value="{{ game["publisher"] if get('game', False) else "" }}">
+                        <input type="text" name="publisher" id="publisher" class="form-input" placeholder="Tradewest" value="{{ game["publisher"] or "" if get('game', False) else "" }}">
                     </div>
                 </div>
 
                 <div class="col-span-6 sm:col-span-2">
                     <label for="developer" class="block text-sm font-medium text-theme-700 dark:text-theme-300">Developer</label>
                     <div class="mt-1 flex">
-                        <input type="text" name="developer" id="developer" class="form-input" placeholder="Rareware" value="{{ game["developer"] if get('game', False) else "" }}">
+                        <input type="text" name="developer" id="developer" class="form-input" placeholder="Rareware" value="{{ game["developer"] or "" if get('game', False) else "" }}">
                     </div>
                 </div>
 
                 <div class="col-span-6 sm:col-span-2">
                     <label for="Published" class="block text-sm font-medium text-theme-700 dark:text-theme-300">Published</label>
                     <div class="mt-1 flex">
-                        <input type="date" name="Published" id="Published" class="form-input" placeholder="07/13/1991" value="{{ game["releasedate_form"] if get('game', False) else "" }}">
+                        <input type="date" name="Published" id="Published" class="form-input" placeholder="07/13/1991" value="{{ game["releasedate_form"] or "" if get('game', False) else "" }}">
                     </div>
                 </div>
 
                 <div class="col-span-6 sm:col-span-2">
                     <label for="genre" class="block text-sm font-medium text-theme-700 dark:text-theme-300">Genre</label>
                     <div class="mt-1 flex">
-                        <input type="text" name="genre" id="genre" class="form-input" placeholder="Action, Beat'em Up" value="{{ game["genre"] if get('game', False) else "" }}">
+                        <input type="text" name="genre" id="genre" class="form-input" placeholder="Action, Beat'em Up" value="{{ game["genre"] or "" if get('game', False) else "" }}">
                     </div>
                 </div>
 
                 <div class="col-span-6 sm:col-span-1">
                     <label for="players" class="block text-sm font-medium text-theme-700 dark:text-theme-300">Players</label>
                     <div class="mt-1 flex">
-                        <input type="text" name="players" id="players" class="form-input" placeholder="2" value="{{ game["players"] if get('game', False) else "" }}">
+                        <input type="text" name="players" id="players" class="form-input" placeholder="2" value="{{ game["players"] or "" if get('game', False) else "" }}">
                     </div>
                 </div>
 
                 <div class="col-span-6 sm:col-span-1">
                     <label for="region" class="block text-sm font-medium text-theme-700 dark:text-theme-300">Region</label>
                     <div class="mt-1 flex">
-                        <input type="text" name="region" id="region" class="form-input" placeholder="USA" value="{{ game["region"] if get('game', False) else "" }}">
+                        <input type="text" name="region" id="region" class="form-input" placeholder="USA" value="{{ game["region"] or "" if get('game', False) else "" }}">
                     </div>
                 </div>
 
@@ -103,16 +103,16 @@ include('_header.tpl',
                           max="5"
                           oninput="this.style.setProperty('--value', `${this.valueAsNumber}`)"
                           step="0.25"
-                          style="--value:{{ game["rating"] * 5 if get('game', False) else 0 }}"
+                          style="--value:{{ (game["rating"] or 0) * 5 if get('game', False) else 0 }}"
                           type="range"
-                          value="{{ game["rating"] * 5 if get('game', False) else 0 }}">
+                          value="{{ (game["rating"] or 0) * 5 if get('game', False) else 0 }}">
                       </label>
                 </div>
 
                 <div class="col-span-6">
                     <label for="description" class="block text-sm font-medium text-theme-700 dark:text-theme-300">Description</label>
                     <div class="mt-1">
-                        <textarea id="description" name="description" rows="3" class="shadow-sm focus:ring-accent-500 dark:focus:ring-accent-400 border-theme-400 focus:border-theme-500 mt-1 block w-full sm:text-sm border text-theme-800 placeholder-theme-400 dark:text-theme-300 bg-theme-200 dark:bg-theme-700 rounded-md">{{ game["desc"] if get('game', False) else "" }}</textarea>
+                        <textarea id="description" name="description" rows="3" class="shadow-sm focus:ring-accent-500 dark:focus:ring-accent-400 border-theme-400 focus:border-theme-500 mt-1 block w-full sm:text-sm border text-theme-800 placeholder-theme-400 dark:text-theme-300 bg-theme-200 dark:bg-theme-700 rounded-md">{{ game["desc"] or "" if get('game', False) else "" }}</textarea>
                     </div>
                 </div>
 
