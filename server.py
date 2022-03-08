@@ -15,16 +15,14 @@ from uuid import uuid4
 @view('index')
 def index():
     systems = []
-    es_systems = ElementTree.parse(es_systems_path).getroot()
 
-    for system in es_systems.iter('system'):
+    for system in get_systems_list().iter('system'):
         system_folder_path = find_normalized(system, 'path')
         extensions = find_normalized(system, 'extension').split(" ")
         systems.append({
             'fullname': find_normalized(system, 'fullname'),
             'name': find_normalized(system, 'name'),
             'manufacturer': find_image_path(system, 'manufacturer'),
-            'folder': find_normalized_system_path(system, 'path'),
             'path': find_normalized(system, 'path'),
             'roms': len(list_files_with_extensions(system_folder_path, extensions))
         })
@@ -37,11 +35,10 @@ def index():
 @route('/system/<system>')
 @view('system')
 def view_system(system):
-    es_systems = ElementTree.parse(es_systems_path).getroot()
-    system_ele = es_systems.findall(".//system/[path=\"%s%s\"]" % (roms_folder, system))[0]
+    system_ele = get_system_element(system)
     system_info = get_system_info(system_ele)
     system_name = system_info["fullname"] or system
-    games = list_roms(system_ele)
+    games = list_roms(system)
     sorted_games = sorted(games, key=lambda k: (k['name']))
     return dict(system=system, system_name=system_name, games=json.dumps(sorted_games), system_info=system_info)
 
@@ -59,8 +56,7 @@ def view_game(system, game_ref):
 @route('/edit/<system>/<game_ref:path>')
 def edit(system, game_ref):
     game = get_game_info(system, game_ref)
-    es_systems = ElementTree.parse(es_systems_path).getroot()
-    system_ele = es_systems.findall(".//system/[path=\"%s%s\"]" % (roms_folder, system))[0]
+    system_ele = get_system_element(system)
     system_info = get_system_info(system_ele)
     system_name = system_info["fullname"] or system
     extensions = set([ext.lower() for ext in system_info["extension"].split(" ")])
@@ -87,7 +83,7 @@ def edit(system, game_ref):
 
 @route('/exists/<system>/<rom>')
 def exists(system, rom):
-    gamelist = os.path.join(roms_folder, system, 'gamelist.xml')
+    gamelist = os.path.join(get_system_path(system), 'gamelist.xml')
 
     if os.path.isfile(gamelist):
         root = ElementTree.parse(gamelist).getroot()
@@ -103,7 +99,7 @@ def exists(system, rom):
 @post('/upload/<system>')
 def upload_rom(system):
     if request.forms.get('submit'):
-        gamelist = os.path.join(roms_folder, system, 'gamelist.xml')
+        gamelist = os.path.join(get_system_path(system), 'gamelist.xml')
 
         if os.path.isfile(gamelist):
             tree = ElementTree.parse(gamelist)
@@ -181,18 +177,22 @@ def upload_rom(system):
 
         if marquee and marquee.filename != 'empty':
             update_game_entry(game, 'marquee', "./images/%s" % marquee.raw_filename)
+            os.makedirs(system_path(system, 'images'), exist_ok=True)
             marquee.save(system_path(system, 'images', marquee.raw_filename), overwrite=True)
 
         if screenshot and screenshot.filename != 'empty':
             update_game_entry(game, 'image', "./images/%s" % screenshot.raw_filename)
+            os.makedirs(system_path(system, 'images'), exist_ok=True)
             screenshot.save(system_path(system, 'images', screenshot.raw_filename), overwrite=True)
 
         if boxart and boxart.filename != 'empty':
             update_game_entry(game, 'thumbnail', "./images/%s" % boxart.raw_filename)
+            os.makedirs(system_path(system, 'images'), exist_ok=True)
             boxart.save(system_path(system, 'images', boxart.raw_filename), overwrite=True)
 
         if video and video.filename != 'empty':
             update_game_entry(game, 'video', "./videos/%s" % boxart.raw_filename)
+            os.makedirs(system_path(system, 'videos'), exist_ok=True)
             video.save(system_path(system, 'videos', boxart.raw_filename), overwrite=True)
 
         with open(gamelist, 'wb') as file:
@@ -202,8 +202,7 @@ def upload_rom(system):
 
         return redirect('/system/%s/%s' % (system, game_id if game_id else rom_filename))
     else:
-        es_systems = ElementTree.parse(es_systems_path).getroot()
-        system_ele = es_systems.findall(".//system/[path=\"%s%s\"]" % (roms_folder, system))[0]
+        system_ele = get_system_element(system)
         system_info = get_system_info(system_ele)
         system_name = system_info["fullname"] or system
         extensions = set([ext.lower() for ext in system_info["extension"].split(" ")])
@@ -231,26 +230,26 @@ def view_svg(text):
     return template('views/empty_svg.tpl', system=text.split())
 
 
-@route('/image/<system>/<image>')
+@route('/image/<system>/<image:path>')
 def view_image(system, image):
-    image = os.path.join('images', unquote(image))
-    path = os.path.join(roms_folder, system)
+    image = unquote(image)
+    path=get_system_path(system)
     response.set_header('Cache-Control', 'max-age=3600')
     return static_file(image, root=path)
 
 
-@route('/video/<system>/<video>')
+@route('/video/<system>/<video:path>')
 def view_video(system, video):
-    video = os.path.join('videos', unquote(video))
-    path = os.path.join(roms_folder, system)
+    video = unquote(video)
+    path=get_system_path(system)
     response.set_header('Cache-Control', 'max-age=3600')
     return static_file(video, root=path)
 
 
-@route('/rom/<system>/<rom>')
+@route('/rom/<system>/<rom:path>')
 def download_rom(system, rom):
     rom = unquote(rom)
-    path = os.path.join(roms_folder, system)
+    path=get_system_path(system)
     return static_file(rom, root=path, download=rom)
 
 
@@ -282,7 +281,7 @@ def assets(path):
 
 @route('/launch/<system>/<rom>')
 def assets(system, rom):
-    path = os.path.join(roms_folder, system, rom)
+    path = os.path.join(get_system_path(system), rom)
     start_game(path)
 
 
