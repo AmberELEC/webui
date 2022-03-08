@@ -1,7 +1,7 @@
 % include('_header.tpl', nav={ "Systems": "/" }, search=True)
     <ul role="list" class="grid grid-cols-2 gap-5 sm:gap-6 sm:grid-cols-3 lg:grid-cols-4">
         <template x-for="item in filteredData" :key="item.name">
-            <a :href="`/system/${item.folder}`">
+            <a :href="`/system/${item.name}`">
                 <li class="col-span-1 shadow dark:shadow-none rounded-md" :class="item.roms == 0 ? 'opacity-60' : ''">
                     <div class="flex items-center justify-center w-100 h-20 bg-theme-700 dark:bg-theme-800 text-white text-sm font-medium rounded-t-md">
                         <img loading="lazy" :src="`/svg/${item.name}`" class="w-1/2 max-h-20 p-2" :alt="item.fullname">

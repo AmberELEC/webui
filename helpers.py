@@ -41,6 +41,10 @@ def list_files_with_extensions(path, extensions):
 def file_exists(path, file):
     return os.path.isfile(os.path.join(path, file))
 
+def file_get_size(file):
+    if os.path.isfile(file):
+        return os.path.getsize(file)
+
 def folder_exists(path):
     return os.path.isdir(path)
 
@@ -69,24 +73,21 @@ def find_int(node, look):
 
 def find_image_path(node, look):
     if node.find(look) != None and node.find(look).text != None:
-        return remove_prefix(node.find(look).text, "./images/")
+        return node.find(look).text
     else:
         return False
 
 def find_video_path(node, look):
     if node.find(look) != None and node.find(look).text != None:
-        return remove_prefix(node.find(look).text, "./videos/")
+        return node.find(look).text
     else:
         return False
 
 def find_normalized_path(node, look):
     return remove_prefix(find_normalized(node, look), "./")
 
-def find_normalized_system_path(node, look):
-    return remove_prefix(find_normalized(node, look), roms_folder)
-
 def system_path(system, *paths):
-    return os.path.join(os.path.abspath(roms_folder), system, *paths)
+    return os.path.join(os.path.abspath(get_system_path(system)), *paths)
 
 def find_date(node, look):
     if find_normalized(node, look):
@@ -101,11 +102,16 @@ def find_date_form(node, look):
         return False
 
 def format_xml_date(date):
-    return datetime.datetime.strptime(date, '%Y%m%dT%H%M%S').strftime('%d %B %Y')
+    try:
+      return datetime.datetime.strptime(date, '%Y%m%dT%H%M%S').strftime('%d %B %Y')
+    except ValueError:
+      return date
 
 def format_xml_date_form(date):
-    return datetime.datetime.strptime(date, '%Y%m%dT%H%M%S').strftime('%Y-%m-%d')
-
+    try:
+      return datetime.datetime.strptime(date, '%Y%m%dT%H%M%S').strftime('%Y-%m-%d')
+    except ValueError:
+      return date
 def date_to_xml(date):
     return datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%dT%H%M%S')
 
@@ -149,8 +155,7 @@ def getsize_fmt(path):
         return "0b"
 
 def map_system_folder(system):
-    es_systems = ElementTree.parse(es_systems_path).getroot()
-    system_ele = es_systems.find(".//system[path=\"%s%s\"]" % (roms_folder, system))
+    system_ele = get_system_element(system)
     if system_ele:
         return system_ele.find("fullname").text
     return system
@@ -203,8 +208,30 @@ def get_system_info(system):
         'extension': find_normalized(system, 'extension')
     }
 
+es_systems = None
+
+# This lazy caches the ES systems list (from es_systems.cfg)
+# - the file is read only - so caching is ok
+# - caching does trade a bit of memory usage for not having to reload from file.
+#   I think this is necessary to figure out the non-standard system paths. 
+#   - Another option to limit memory would be to refactor to just cache the system paths in a dictionary, etc.
+def get_systems_list():
+    global es_systems
+    
+    if not es_systems:
+        es_systems = ElementTree.parse(es_systems_path).getroot()
+
+    return es_systems
+
+def get_system_element(system_name):
+    return get_systems_list().findall(".//system/[name=\"%s\"]" % ( system_name))[0]
+
+def get_system_path(system_name):
+    return find_normalized(get_system_element(system_name),'path')
+
 def get_game_info(system, game_ref):
-    gamelist = os.path.join(roms_folder, system, 'gamelist.xml')
+    system_folder_path = get_system_path(system)
+    gamelist = os.path.join(system_folder_path, 'gamelist.xml')
 
     if os.path.isfile(gamelist):
         root = ElementTree.parse(gamelist).getroot()
@@ -219,7 +246,7 @@ def get_game_info(system, game_ref):
         if ele != None:
 
             rom_filename = remove_prefix(find_normalized(ele, 'path'), './')
-            rom_path = os.path.join(roms_folder, system, rom_filename)
+            rom_path = os.path.join(system_folder_path, rom_filename)
 
             game = {
                 'id': ele.attrib.get('id', False) or rom_filename,
@@ -250,20 +277,20 @@ def get_game_info(system, game_ref):
             }
 
             if game["image"]:
-                game["image_size"] = os.path.getsize(os.path.join(roms_folder, system, 'images', find_image_path(ele, 'image')))
+                game["image_size"] = file_get_size(os.path.join(system_folder_path, find_image_path(ele, 'image')))
 
             if game["thumbnail"]:
-                game["thumbnail_size"] = os.path.getsize(os.path.join(roms_folder, system, 'images', find_image_path(ele, 'thumbnail')))
+                game["thumbnail_size"] = file_get_size(os.path.join(system_folder_path, find_image_path(ele, 'thumbnail')))
 
             if game["marquee"]:
-                game["marquee_size"] = os.path.getsize(os.path.join(roms_folder, system, 'images', find_image_path(ele, 'marquee')))
+                game["marquee_size"] = file_get_size(os.path.join(system_folder_path, find_image_path(ele, 'marquee')))
 
             if game["video"]:
-                game["video_size"] = os.path.getsize(os.path.join(roms_folder, system, 'videos', find_video_path(ele, 'video')))
+                game["video_size"] = file_get_size(os.path.join(system_folder_path, find_image_path(ele, 'video')))
 
             return game
 
-    rom_path = os.path.join(roms_folder, system, unescape(game_ref))
+    rom_path = os.path.join(system_folder_path, unescape(game_ref))
     if os.path.isfile(rom_path):
         game = {
             'id': game_ref,
@@ -301,9 +328,9 @@ def get_game_info(system, game_ref):
     else:
         return False
 
-def list_roms(system_ele):
-    system = find_normalized_system_path(system_ele, 'path')
-    gamelist = os.path.join(roms_folder, system, 'gamelist.xml')
+def list_roms(system):
+    system_ele = get_system_element(system)
+    gamelist = os.path.join(get_system_path(system), 'gamelist.xml')
 
     roms = []
     known_roms = []
@@ -326,7 +353,7 @@ def list_roms(system_ele):
                 'path': rom_filename,
             })
 
-    rom_files = list_files(os.path.join(roms_folder, system))
+    rom_files = list_files(get_system_path(system))
     extensions = system_ele.find("extension").text.split(" ")
 
     for file in rom_files:
