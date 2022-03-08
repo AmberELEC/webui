@@ -270,7 +270,7 @@ def get_game_info(system, game_ref):
                 'playcount': find_int(ele, 'playcount'),
                 'gametime': find_int(ele, 'gametime'),
                 'size': getsize_fmt(rom_path),
-                'size_raw': os.path.getsize(rom_path),
+                'size_raw': file_get_size(rom_path),
                 'have_rom': os.path.isfile(rom_path),
                 'saves': find_saves(system, rom_filename),
                 'screenshots': find_screenshots(rom_filename)
