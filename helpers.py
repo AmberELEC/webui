@@ -53,6 +53,12 @@ def remove_prefix(text, prefix):
         return text[len(prefix):]
     return text
 
+def find(node, look):
+    if node.find(look) != None and node.find(look).text != None:
+        return node.find(look).text
+    else:
+        return False
+
 def find_normalized(node, look):
     if node.find(look) != None and node.find(look).text != None:
         return fix_text(unescape(node.find(look).text))
@@ -245,7 +251,8 @@ def get_game_info(system, game_ref):
 
         if ele != None:
 
-            rom_filename = remove_prefix(find_normalized(ele, 'path'), './')
+            #NOTE: is it important the rom_filename is not 'normalized' as it will mess up loading from file system in cases like: é
+            rom_filename = remove_prefix(find(ele, 'path'), './')
             rom_path = os.path.join(system_folder_path, rom_filename)
 
             game = {
@@ -263,7 +270,7 @@ def get_game_info(system, game_ref):
                 'marquee': find_image_path(ele, 'marquee'),
                 'video': find_video_path(ele, 'video'),
                 'rating': find_float(ele, 'rating'),
-                'path': find_normalized_path(ele, 'path'),
+                'path': rom_filename,
                 'releasedate': find_date(ele, 'releasedate'),
                 'releasedate_form': find_date_form(ele, 'releasedate'),
                 'lastplayed': find_date(ele, 'lastplayed'),
@@ -339,7 +346,14 @@ def list_roms(system):
         root = ElementTree.parse(gamelist).getroot()
         for game in root.iter('game'):
             id = game.attrib.get('id')
-            rom_filename = normalize_path(find_normalized(game, 'path'))
+
+            # NOTE: it is important the filename is not normalized using 'find_normalized' or it will mess up loading from file system
+            rom_filename = remove_prefix(find(game, 'path'), './')
+
+            # Hide any entries where files don't exist
+            if not os.path.isfile(os.path.join(get_system_path(system),rom_filename)):
+                continue
+
             known_roms.append(rom_filename)
             roms.append({
                 'id': id or False,
