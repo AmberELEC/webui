@@ -134,12 +134,18 @@ def upload_rom(system):
                 game = root.find(".//game/[path=\"./%s\"]" % rom.raw_filename)
             else:
                 game = SubElement(root, 'game', attrib={ 'id': str(uuid4()) })
+                game.tail = "\n"
                 entry = SubElement(game, 'path')
                 entry.text = "./%s" % rom.raw_filename
             rom_filename = rom.raw_filename
         elif existing_rom:
             game = root.find(".//game/[path=\"./%s\"]" % existing_rom)
             rom_filename = existing_rom
+            if not game:
+                game = SubElement(root, 'game', attrib={ 'id': str(uuid4()) })
+                game.tail = "\n"
+                entry = SubElement(game, 'path')
+                entry.text = "./%s" % existing_rom
         else:
             return redirect('/')
 
