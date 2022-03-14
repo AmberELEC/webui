@@ -24,7 +24,7 @@ def index():
             'name': find_normalized(system, 'name'),
             'manufacturer': find_image_path(system, 'manufacturer'),
             'path': find_normalized(system, 'path'),
-            'roms': len(list_files_with_extensions(system_folder_path, extensions))
+            'roms': len(list_files_and_folders_with_extensions(system_folder_path, extensions))
         })
 
     systems_sorted = sorted(systems, key=lambda k: (-k['roms'], k['fullname']))
