@@ -130,9 +130,11 @@
                                 </div>
                                 <div class="ml-4 flex-shrink-0">
                                     % if game["have_rom"]:
+                                        % if game["can_download"]:
                                         <a href="/rom/{{ system }}/{{ game["path"] }}" class="font-medium underline text-theme-600 hover:text-theme-500 dark:text-theme-200 dark:hover:text-theme-300">
                                             <i class="far fa-download"></i>
                                         </a>
+                                        % end
                                     % else:
                                         <span class="font-medium text-theme-600 dark:text-theme-200">
                                             Missing ROM

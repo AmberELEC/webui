@@ -22,19 +22,19 @@ def list_folders(path):
             dirs.append(entry.name)
     return dirs
 
-def list_files(path):
+def list_files_and_folders(path):
     files = []
     if folder_exists(path):
         for entry in os.scandir(path):
-            if not entry.name.startswith('.') and entry.is_file():
+            if not entry.name.startswith('.'):
                 files.append(entry.name)
     return files
 
-def list_files_with_extensions(path, extensions):
+def list_files_and_folders_with_extensions(path, extensions):
     files = []
     if folder_exists(path):
         for entry in os.scandir(path):
-            if not entry.name.startswith('.') and entry.is_file() and os.path.splitext(entry)[1] in extensions:
+            if not entry.name.startswith('.') and os.path.splitext(entry)[1] in extensions:
                 files.append(entry.name)
     return files
 
@@ -157,6 +157,9 @@ def getsize_fmt(path):
                 return f"{size:3.1f}{unit}b"
             size /= 1024.0
         return f"{size:.1f}Yib"
+
+    if os.path.isdir(path):
+        return ""
     else:
         return "0b"
 
@@ -278,7 +281,8 @@ def get_game_info(system, game_ref):
                 'gametime': find_int(ele, 'gametime'),
                 'size': getsize_fmt(rom_path),
                 'size_raw': file_get_size(rom_path),
-                'have_rom': os.path.isfile(rom_path),
+                'have_rom': os.path.exists(rom_path),
+                'can_download': os.path.isfile(rom_path),
                 'saves': find_saves(system, rom_filename),
                 'screenshots': find_screenshots(rom_filename)
             }
@@ -298,7 +302,7 @@ def get_game_info(system, game_ref):
             return game
 
     rom_path = os.path.join(system_folder_path, unescape(game_ref))
-    if os.path.isfile(rom_path):
+    if os.path.exists(rom_path):
         game = {
             'id': game_ref,
             'name': game_ref,
@@ -325,8 +329,9 @@ def get_game_info(system, game_ref):
             'playcount': False,
             'gametime': False,
             'size': getsize_fmt(rom_path),
-            'size_raw': os.path.getsize(rom_path),
+            'size_raw': file_get_size(rom_path),
             'have_rom': True,
+            'can_download': os.path.isfile(rom_path),
             'saves': find_saves(system, rom_path),
             'screenshots': find_screenshots(rom_path),
         }
@@ -351,7 +356,7 @@ def list_roms(system):
             rom_filename = remove_prefix(find(game, 'path'), './')
 
             # Hide any entries where files don't exist
-            if not os.path.isfile(os.path.join(get_system_path(system),rom_filename)):
+            if not os.path.exists(os.path.join(get_system_path(system),rom_filename)):
                 continue
 
             known_roms.append(rom_filename)
@@ -367,7 +372,7 @@ def list_roms(system):
                 'path': rom_filename,
             })
 
-    rom_files = list_files(get_system_path(system))
+    rom_files = list_files_and_folders(get_system_path(system))
     extensions = system_ele.find("extension").text.split(" ")
 
     for file in rom_files:
