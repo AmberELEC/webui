@@ -113,6 +113,9 @@
             width: 100%;
             height: 100%;
         }
+        body {
+            font-family: sans-serif, FontAwesome;
+        }
 
         :root {
             --scrollbar-track-dark: #475569; /* slate-600 */
