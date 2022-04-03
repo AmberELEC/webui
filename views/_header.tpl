@@ -9,9 +9,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     % if defined("title"):
-        <title>351ELEC WebUI / {{ title }}</title>
+        <title>AmberELEC WebUI / {{ title }}</title>
     % else:
-        <title>351ELEC WebUI</title>
+        <title>AmberELEC WebUI</title>
     % end
     <script src="https://unpkg.com/alpinejs" defer></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,line-clamp"></script>
