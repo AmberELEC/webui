@@ -1,18 +1,50 @@
-from distutils import extension
+# full imports
 import os
 import json
+import pam
 
+# partial imports
 from urllib.parse import unquote
-
-from bottle import route, get, post, run, template, view, static_file, response, request, redirect
-from helpers import *
-from config import *
+from distutils import extension
+from uuid import uuid4
+from bottle import app, route, get, post, run, template, view, static_file, response, request, redirect, auth_basic
+from beaker.middleware import SessionMiddleware
 from xml.etree.ElementTree import SubElement, Element
 from xml.etree.ElementTree import ElementTree as ET
-from uuid import uuid4
+
+# local imports
+from config import *
+from helpers import *
+
+session_opts = {
+    'session.key': 'amberelec-webui',
+    'session.type': 'memory',
+    'session.cookie_expires': 3600, # 1 hour
+    'session.auto': True
+}
+
+app = SessionMiddleware(app(), session_opts)
+
+def check_auth(username, password):
+    session = request.environ.get('beaker.session')
+
+    if session.get('authenticated', False):
+        return True
+    else:
+        if pam.authenticate(username, password):
+            session['authenticated'] = True
+            session.save()
+            return True
+        else:
+            session['authenticated'] = False
+            session.save()
+            return False
+
+    return False
 
 @route('/')
 @view('index')
+@auth_basic(check_auth)
 def index():
     systems = []
 
@@ -34,6 +66,7 @@ def index():
 
 @route('/system/<system>')
 @view('system')
+@auth_basic(check_auth)
 def view_system(system):
     system_ele = get_system_element(system)
     system_info = get_system_info(system_ele)
@@ -46,6 +79,7 @@ def view_system(system):
 @route('/system/<system>/<game_ref:int>')
 @route('/system/<system>/<game_ref:path>')
 @view('game')
+@auth_basic(check_auth)
 def view_game(system, game_ref):
     game = get_game_info(system, game_ref)
     system_name = map_system_folder(system)
@@ -54,6 +88,7 @@ def view_game(system, game_ref):
 
 @route('/edit/<system>/<game_ref:int>')
 @route('/edit/<system>/<game_ref:path>')
+@auth_basic(check_auth)
 def edit(system, game_ref):
     game = get_game_info(system, game_ref)
     system_ele = get_system_element(system)
@@ -82,6 +117,7 @@ def edit(system, game_ref):
 
 
 @route('/exists/<system>/<rom>')
+@auth_basic(check_auth)
 def exists(system, rom):
     gamelist = os.path.join(get_system_path(system), 'gamelist.xml')
 
@@ -97,6 +133,7 @@ def exists(system, rom):
 
 @get('/upload/<system>')
 @post('/upload/<system>')
+@auth_basic(check_auth)
 def upload_rom(system):
     if request.forms.get('submit'):
         gamelist = os.path.join(get_system_path(system), 'gamelist.xml')
@@ -216,6 +253,7 @@ def upload_rom(system):
 
 
 @route('/svg/<system>')
+@auth_basic(check_auth)
 def view_svg(system):
     """Fetches a system logo SVG, or generates a simple text SVG if the logo is missing."""
     svg_dir = os.path.join(os.getcwd(), 'assets', 'svgs')
@@ -231,12 +269,14 @@ def view_svg(system):
 
 
 @route('/svg/text/<text>')
+@auth_basic(check_auth)
 def view_svg(text):
     response.set_header('Content-Type', 'image/svg+xml')
     return template('views/empty_svg.tpl', system=text.split())
 
 
 @route('/image/<system>/<image:path>')
+@auth_basic(check_auth)
 def view_image(system, image):
     image = unquote(image)
     path=get_system_path(system)
@@ -245,6 +285,7 @@ def view_image(system, image):
 
 
 @route('/video/<system>/<video:path>')
+@auth_basic(check_auth)
 def view_video(system, video):
     video = unquote(video)
     path=get_system_path(system)
@@ -253,6 +294,7 @@ def view_video(system, video):
 
 
 @route('/rom/<system>/<rom:path>')
+@auth_basic(check_auth)
 def download_rom(system, rom):
     rom = unquote(rom)
     path=get_system_path(system)
@@ -260,6 +302,7 @@ def download_rom(system, rom):
 
 
 @route('/snapshot/<system>/<save>')
+@auth_basic(check_auth)
 def view_snapshot(system, save):
     path = os.path.join(roms_folder, 'savestates', system)
     png = '%s%s' % (save, '.png')
@@ -268,37 +311,43 @@ def view_snapshot(system, save):
 
 
 @route('/savestate/<system>/<save>')
+@auth_basic(check_auth)
 def download_savestate(system, save):
     path = os.path.join(roms_folder, 'savestates', system)
     return static_file(save, root=path, download=save)
 
 
 @route('/screenshots/<screenshot>')
+@auth_basic(check_auth)
 def view_screenshot(screenshot):
     path = os.path.join(roms_folder, 'screenshots')
     return static_file(screenshot, root=path)
 
 
 @route('/assets/<path:path>')
+@auth_basic(check_auth)
 def assets(path):
     root = os.path.join(os.getcwd(), 'assets')
     return static_file(path, root=root)
 
 
 @route('/launch/<system>/<rom>')
+@auth_basic(check_auth)
 def assets(system, rom):
     path = os.path.join(get_system_path(system), rom)
     start_game(path)
 
 
 @route('/exitemu')
+@auth_basic(check_auth)
 def assets():
     close_game()
 
 
 @route('/reloadgames')
+@auth_basic(check_auth)
 def assets():
     reload_gameslist()
 
 
-run(host=host, port=port, reloader=reloader, debug=debug)
+run(app=app, host=host, port=port, reloader=reloader, debug=debug)
