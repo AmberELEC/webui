@@ -4,6 +4,7 @@ debug = False
 reloader = False
 roms_folder = "/storage/roms/"
 es_systems_path = "/usr/config/emulationstation/es_systems.cfg"
+disable_auth = True
 
 # host = "127.0.0.1"
 # port = 8080
