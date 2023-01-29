@@ -26,7 +26,7 @@ session_opts = {
 app = SessionMiddleware(app(), session_opts)
 
 def check_auth(username, password):
-    if config.disable_auth:
+    if disable_auth:
         return True
 
     session = request.environ.get('beaker.session')
