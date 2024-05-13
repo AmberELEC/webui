@@ -260,7 +260,9 @@ def upload_rom(system):
 def view_svg(system):
     """Fetches a system logo SVG, or generates a simple text SVG if the logo is missing."""
     svg_dir = os.path.join(os.getcwd(), 'assets', 'svgs')
-    svg = '%s.svg' % system
+    system_ele = get_system_element(system)
+    theme = system_ele.find("theme").text
+    svg = '%s.svg' % theme
 
     response.set_header('Cache-Control', 'max-age=3600')
 

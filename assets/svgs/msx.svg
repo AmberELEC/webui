@@ -1,60 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:bx="https://boxy-svg.com"
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   version="1.1"
-   id="svg2"
-   sodipodi:docname="msx.svg"
-   width="264"
-   height="90"
-   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
-  <metadata
-     id="metadata10">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <defs
-     id="defs8" />
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="532"
-     inkscape:window-height="460"
-     id="namedview6"
-     showgrid="false"
-     inkscape:zoom="2.36"
-     inkscape:cx="50"
-     inkscape:cy="40"
-     inkscape:window-x="72"
-     inkscape:window-y="27"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg2" />
-  <g
-     transform="scale(0.44,0.437707)"
-     id="g3">
-    <path
-       id="path2830"
-       d="M 0,204.888 52.05,0 h 48.267 L 125.397,89.433 151.422,0 h 45.426 l 42.585,150.945 103.905,-0.195 c 10.905,-0.108 11.577,-22.662 -0.807,-22.656 l -60.513,-0.807 C 256.035,127.536 228.633,99.426 229.968,61.986 230.247,27.645 260.19,0.603 298.5,0.612 L 452.838,0.474 492.114,53.943 530.442,0 594.321,0.474 524.292,98.898 600,205.617 536.454,205.419 492.39,144.186 450.471,205.419 385.647,205.362 459.465,99.843 427.287,52.998 293.121,53.193 c -14.64,0.135 -14.103,23.169 0.117,22.737 l 56.526,0.867 c 23.892,0.153 57.54,24.981 56.703,63.741 0.363,45.06 -40.221,65.646 -59.76,64.548 l -147.966,0.195 -24.606,-92.187 -24.606,91.992 h -46.71 L 77.13,113.565 54.555,205.224 Z"
-       style="fill:#ffffff"
-       bx:origin="0 0"
-       inkscape:connector-curvature="0" />
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" id="svg2" viewBox="0 0 264 90" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <g transform="matrix(0.44, 0, 0, 0.437707, 0, 0)">
+    <path id="path2830" d="M 0 204.888 L 52.05 0 L 100.317 0 L 125.397 89.433 L 151.422 0 L 196.848 0 L 239.433 150.945 L 343.338 150.75 C 354.243 150.642 354.915 128.088 342.531 128.094 L 282.018 127.287 C 256.035 127.536 228.633 99.426 229.968 61.986 C 230.247 27.645 260.19 0.603 298.5 0.612 L 452.838 0.474 L 492.114 53.943 L 530.442 0 L 594.321 0.474 L 524.292 98.898 L 600 205.617 L 536.454 205.419 L 492.39 144.186 L 450.471 205.419 L 385.647 205.362 L 459.465 99.843 L 427.287 52.998 L 293.121 53.193 C 278.481 53.328 279.018 76.362 293.238 75.93 L 349.764 76.797 C 373.656 76.95 407.304 101.778 406.467 140.538 C 406.83 185.598 366.246 206.184 346.707 205.086 L 198.741 205.281 L 174.135 113.094 L 149.529 205.086 L 102.819 205.086 L 77.13 113.565 L 54.555 205.224 L 0 204.888 Z" style="fill: rgb(255, 255, 255);" bx:origin="0 0"/>
   </g>
 </svg>
